@@ -13,7 +13,12 @@ body {
     align-items: center;
 }
 
-
+.nice-font {
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
+    font-size: 13px;
+    color: black;
+}
 
 .scrolling-wrapper-flexbox {
     display: flex;
@@ -24,11 +29,11 @@ body {
     overflow-x: auto;
 
 
-
 }
+
 .card {
     flex: 0 0 auto;
-    width: 300px;
+    width: 280px;
     height: fit-content;
     background-color: #EDEEF0;
     border-radius: 5px;
