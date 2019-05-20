@@ -1,0 +1,61 @@
+body {
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    margin: 0 !important;
+
+
+    background-color: #8e44ad;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+.scrolling-wrapper-flexbox {
+    display: flex;
+    flex-wrap: nowrap;
+    min-width: 100%;
+    min-height: 100%;
+    margin: 20px 0 20px 0;
+    overflow-x: auto;
+
+
+
+}
+.card {
+    flex: 0 0 auto;
+    width: 300px;
+    height: fit-content;
+    background-color: #EDEEF0;
+    border-radius: 5px;
+    margin: 0 10px 0 10px;
+}
+
+.card--content {
+    width: 300px;
+    height: fit-content;
+    background-color: #EDEEF0;
+    border-radius: 5px;
+    margin: 0 10px 0 10px;
+}
+
+.grey-text-color {
+    color: #738FA3;
+}
+
+.spacer {
+    min-width: 10px;
+}
+
+.card::-webkit-scrollbar {
+
+
+}
+
+.card-container {
+    margin: 10px;
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>VK-Kanban</title>
+    <link href="styles.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+</head>
+<body>
+
+
+<div class="scrolling-wrapper-flexbox">
+    <div class="spacer"></div>
+    <div class="card">
+        <div class="card-container">
+
+            <div style="color: #000;
+    font-weight: 500;font-family: -apple-system,BlinkMacSystemFont,Roboto,Helvetica Neue,sans-serif; font-size: 13px">
+                Куда идём мы с пяточком большой большой секрет
+            </div>
+            <div style="width: 100%;  max-height: calc(100vh - 120px); overflow-y: auto;">
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div> <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+                <div>card</div>
+
+
+            </div>
+
+            <div style="display: flex;"><i class="material-icons">
+                add
+            </i>
+                <div>Add Button</div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div class="card"></div>
+    <div class="card"></div>
+    <div class="card"></div>
+    <div class="card"></div>
+
+</div>
+
+
+<script>
+    function setBackground(image, xCenter, yCenter) {
+        document.body.style.background = `url('${image}') ${xCenter} ${yCenter} no-repeat fixed`; //требуется спец коофиценты для настройки для разных форматов экрана
+    }
+
+
+    class KanbanManager {
+        constructor(kanbanTasks = []) {
+
+        }
+    }
+
+    let kanabanManager = new KanbanManager();
+
+    let variables = {
+        backgroundPath: 'background.png',
+
+    };
+
+    function initPage() {
+        setBackground(variables.backgroundPath, '20%', '60%');
+    }
+
+    initPage();
+</script>
+</body>
+</html>
