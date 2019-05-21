@@ -11,136 +11,226 @@
 <body>
 
 
-<div class="scrolling-wrapper-flexbox">
-    <div class="spacer"></div>
-    <div class="card">
-        <div class="card-container nice-font">
-
-            <div class="" style="    font-weight: 800;
-     padding-bottom: 10px;">
-                Куда идём мы с пяточком большой большой секрет
-            </div>
-            <div style="width: 100%;  max-height: calc(100vh - 120px); overflow-y: auto;">
-                <div class="white-card">
-                    Пройти курс по React
-                </div>
-                <div class="white-card">
-                    Отметить день рождения
-                </div>
-
-            </div>
-
-            <div class="grey-text-color" style="display: flex;  font-weight: 400;
-    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
-                add
-            </i>
-                <div>Добавить ещё одну карточку</div>
-            </div>
-
-        </div>
+<div class="scrolling-wrapper-flexbox space_element" id="columnBox">
 
 
-    </div>
-    <div class="card">
-        <div class="card-container nice-font">
-
-
-            <div class="grey-text-color" style="display: flex;  font-weight: 400;
-    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
-                add
-            </i>
-                <div>Добавить ещё одну колонку</div>
-            </div>
-
-        </div>
-
-
-    </div>
-    <div class="card">
-        <div class="card-container nice-font">
-
-
-            <div style="width: 100%;  max-height: calc(100vh - 120px); overflow-y: auto;">
-                <div class="white-card" style="color: grey;
-
-    font-weight: 300;">
-                    Введите название колонки
-                </div>
-
-
-            </div>
-
-
-            <div class="grey-text-color" style="display: flex;  font-weight: 400; justify-content: space-between;
-    align-items: center;">
-
-                <div class="green-flat-button">Добавить колонку</div>
-                <i class="material-icons" style="padding-right: 5px;">
-                    close
-                </i>
-
-            </div>
-
-        </div>
-
-
-    </div>
-    <div class="card">
-        <div class="card-container nice-font">
-
-            <div class="" style="    font-weight: 800;
-     padding-bottom: 10px;">
-                Куда идём мы с пяточком большой большой секрет
-            </div>
-            <div style="width: 100%;  max-height: calc(100vh - 120px); overflow-y: auto;">
-                <div class="white-card">
-                    Пройти курс по React
-                </div>
-                <div class="white-card">
-                    Отметить день рождения
-                </div>
-                <div class="white-card" style="color: grey;
-min-height: 34px;
-    font-weight: 300;">
-                    Введите название колонки
-                </div>
-            </div>
-
-            <div class="grey-text-color" style="display: flex;  font-weight: 400; justify-content: space-between;
-    align-items: center;">
-
-                <div class="green-flat-button">Добавить карточку</div>
-                <i class="material-icons" style="padding-right: 5px;">
-                    close
-                </i>
-
-            </div>
-
-        </div>
-
-
-    </div>
-    <div class="card"></div>
-    <div class="card"></div>
-    <div class="card"></div>
-    <div class="card"></div>
 </div>
 
 
 <script>
+
+    //drag
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+    function drag(ev) {
+        console.log(ev);
+        ev.target.classList.add('hide');
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+    function dragEnd(ev) {
+
+        ev.target.classList.remove('hide');
+    }
+    function drop(ev) {
+        ev.preventDefault();
+        let data = ev.dataTransfer.getData("text");
+        ev.target.appendChild(document.getElementById(data));
+
+    }
+
+    //drag
+
     function setBackground(image, xCenter, yCenter) {
         document.body.style.background = `url('${image}') ${xCenter} ${yCenter} no-repeat fixed`; //требуется спец коофиценты для настройки для разных форматов экрана
     }
 
+    function removeElement(elementId) {
+        // Removes an element from the document
+        let element = elementId;
+        if (typeof elementId !== typeof (null)) {
+            element = document.getElementById(elementId);
+        }
+        element.parentNode.removeChild(element);
+    }
+
+    function closeColumn(ev) {
+
+        removeElement(ev.closest('.card'));
+
+    }
+
+    function closeTaskInput(ev) {
+        let card_container = ev.closest('.card-container');
+        removeElement(ev.closest('.input_block'));
+        card_container.innerHTML += `<div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
+            add
+        </i>
+            <div >Добавить ещё одну карточку</div>
+        </div>`;
+    }
+
+    function saveTaskName(ev) {
+        let card = ev.closest('.card');
+        let input = card.getElementsByClassName('textarea')[0];
+        let title = input.value;
+        let id =  kanbanManager.saveColumnCard(title, card.id);
+        let card_container = ev.closest('.card-container');
+        let input_block = card_container.getElementsByClassName('input_block')[0];
+        removeElement(input_block);
+        let cards_list = card_container.getElementsByClassName('cards_list')[0];
+        cards_list.classList.add('card-list-normal');
+        cards_list.classList.remove('card-list-with-input');
+        cards_list.innerHTML += `<div id="card_${id}" draggable="true" ondragover="return false;" ondragend="dragEnd(event);" ondragstart="drag(event)" class="white-card">
+                ${title}
+            </div>`;
+        card_container.innerHTML += `<div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
+            add
+        </i>
+            <div>Добавить ещё одну карточку</div>
+        </div>`;
+
+
+    }
+
+    function openTaskInput(ev) {
+        let card_container = ev.closest('.card-container');
+        removeElement(ev);
+        let cards_list = card_container.getElementsByClassName('cards_list')[0];
+        cards_list.classList.add('card-list-with-input');
+        cards_list.classList.remove('card-list-normal');
+        card_container.innerHTML += `<div class="input_block">
+                <div class="white-card" style="color: grey;
+
+    font-weight: 300;">
+  <textarea type="text" class="textarea" id="inp" placeholder="Введите название карточки" style="
+
+
+"></textarea>
+                </div>
+
+
+
+
+
+            <div class="grey-text-color" style="display: flex;  font-weight: 400; justify-content: space-between;
+    align-items: center;">
+
+                <div class="green-flat-button save_column_name" onclick="saveTaskName(this)">Добавить карточку</div>
+                <i class="material-icons close_column" onclick="closeTaskInput(this);" style="padding-right: 5px;">
+                    close
+                </i>
+
+            </div></div>`;
+    }
+
+    function saveColumnName(ev) {
+        let card = ev.closest('.card');
+        let input = card.getElementsByClassName('textarea')[0];
+        let title = input.value;
+        ev.closest('.card').id = kanbanManager.saveColumn(title);
+        card.getElementsByClassName('card-container')[0].innerHTML = `<div class="" style="    font-weight: 800;
+     padding-bottom: 5px;">
+            ${title}
+        </div>
+        <div class="cards_list card-list-normal" ondrop="drop(event)" ondragover="allowDrop(event)">
+
+
+        </div>
+
+        <div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
+            add
+        </i>
+            <div>Добавить ещё одну карточку</div>
+        </div>`;
+
+    }
+
+    function addElement(parentId, elementTag, elementId, html) {
+        // Adds an element to the document
+        var p = document.getElementById(parentId);
+        var newElement = document.createElement(elementTag);
+        newElement.setAttribute('id', elementId);
+        newElement.innerHTML = html;
+        p.appendChild(newElement);
+    }
 
     class KanbanManager {
         constructor(kanbanTasks = []) {
             if (kanbanTasks.length === 0) {
-
+                this.columns = 0;
+                this.addColumn();
+                this.columnArray = [];
+                this.cardsArray = [];
+                this.columnsData = {};
             }
         }
-        addColumnButton(){
 
+        saveColumnCard(name, columnId) {
+            this.cardsArray.push(name);
+            let cardId = this.cardsArray.length - 1;
+            let num = parseInt(columnId.split('_')[1]);
+
+            if (!this.columnsData[num]) this.columnsData[num] = [];
+            this.columnsData[num].push(cardId);
+            return cardId;
+        }
+
+        saveColumn(name) {
+            this.columnArray.push(name);
+            return `column_${this.columnArray.length}`;
+        }
+
+        addColumn() {
+            let columnButtonElement = `<div class="card button column">
+                                        <div class="card-container nice-font">
+                                            <div class="grey-text-color" style="display: flex;  font-weight: 400;
+    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
+                                                                                        add
+                                                                                     </i>
+                                                  <div>Добавить ещё одну колонку</div>
+                                            </div>
+                                            </div>
+                                        </div>`;
+            document.getElementById('columnBox').innerHTML += columnButtonElement;
+            let column_element = document.getElementsByClassName(`column`);
+            column_element = column_element[column_element.length - 1];
+            /**TODO исправить не очень хорошее решение... **/
+            column_element.addEventListener('click', () => {
+                //console.log(ev);
+                removeElement(column_element.getElementsByClassName('grey-text-color')[0]);
+                let cardContainer = column_element.getElementsByClassName('card-container')[0];
+                cardContainer.innerHTML += `
+                <div class="white-card" style="color: grey;
+
+    font-weight: 300;">
+  <textarea type="text" class="textarea" id="inp" placeholder="Введите название колонки" style="
+
+
+"></textarea>
+                </div>
+
+
+
+
+
+            <div class="grey-text-color" style="display: flex;  font-weight: 400; justify-content: space-between;
+    align-items: center;">
+
+                <div class="green-flat-button save_column_name" onclick="saveColumnName(this)">Добавить колонку</div>
+                <i class="material-icons close_column" onclick="closeColumn(this);" style="padding-right: 5px;">
+                    close
+                </i>
+
+            </div>`;
+                this.addColumn();
+            }, {once: true});
+
+
+            console.log(this.columns)
         }
     }
 
@@ -151,9 +241,34 @@ min-height: 34px;
 
     };
 
+    function autoExpandTextArea() {
+        document.addEventListener('input', function (event) {
+            if (event.target.tagName.toLowerCase() !== 'textarea') return;
+            autoExpand(event.target);
+        }, false);
+    }
+
+    function autoExpand(field) {
+
+        field.style.height = 'inherit';
+
+
+        let computed = window.getComputedStyle(field);
+
+
+        let height = parseInt(computed.getPropertyValue('border-top-width'), 10)
+            + parseInt(computed.getPropertyValue('padding-top'), 10)
+            + field.scrollHeight
+            + parseInt(computed.getPropertyValue('padding-bottom'), 10)
+            + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
+
+        field.style.height = height + 'px';
+    }
+
     function initPage() {
         setBackground(variables.backgroundPath, '20%', '60%');
-        let kanabanManager = new KanbanManager();
+        autoExpandTextArea();
+        window.kanbanManager = new KanbanManager();
     }
 
     window.onload = function () {
