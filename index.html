@@ -20,23 +20,93 @@
 <script>
 
     //drag
+
     function allowDrop(ev) {
         ev.preventDefault();
     }
-    function drag(ev) {
-        console.log(ev);
-        ev.target.classList.add('hide');
-        ev.dataTransfer.setData("text", ev.target.id);
-    }
-    function dragEnd(ev) {
 
+    function not_al(ev) {
+        //window.above = ev;
+        console.log(ev);
+    }
+
+    window.absolute = null;
+
+    function drag(ev) {
+        //ev.dataTransfer.effectAllowed = 'move';
+        console.log(ev);
+        //list.classList.add('no-insert');
+        ev.dataTransfer.setData("text", ev.target.id);
+        let clone_node = ev.target.cloneNode(true);
+        ev.dataTransfer.setDragImage(clone_node, 0, 0);
+
+        //clone_node.style.opacity = 0;
+        setTimeout(function () {
+
+            let clone_node = ev.target.cloneNode(true);
+            clone_node.classList.add('absolute');
+
+            //clone_node.style.transform ="rotate(7deg)";
+            //clone_node.style.width = ev.
+            document.body.appendChild(clone_node);
+
+            window.absolute = clone_node;
+
+            //clone_node.classList.add('absolute');
+            //document.appendChild(clone_node);
+            ev.target.classList.add('hide');
+        }, 1);
+        //this.classList.add('dragging');
+
+    }
+
+    function updatePosAb(event) {
+        if (window.absolute) {
+            let eventDoc, doc, body;
+
+            event = event || window.event; // IE-ism
+
+            // If pageX/Y aren't available and clientX/Y are,
+            // calculate pageX/Y - logic taken from jQuery.
+            // (This is to support old IE)
+            if (event.pageX == null && event.clientX != null) {
+                eventDoc = (event.target && event.target.ownerDocument) || document;
+                doc = eventDoc.documentElement;
+                body = eventDoc.body;
+
+                event.pageX = event.clientX +
+                    (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+                    (doc && doc.clientLeft || body && body.clientLeft || 0);
+                event.pageY = event.clientY +
+                    (doc && doc.scrollTop || body && body.scrollTop || 0) -
+                    (doc && doc.clientTop || body && body.clientTop || 0);
+            }
+
+            window.absolute.style.top = `${event.pageY}px`;
+            window.absolute.style.left = `${event.pageX}px`;
+        }
+    }
+
+    function dragEnd(ev) {
+        let list = ev.target.closest('.cards_list');
         ev.target.classList.remove('hide');
     }
+
     function drop(ev) {
         ev.preventDefault();
         let data = ev.dataTransfer.getData("text");
-        ev.target.appendChild(document.getElementById(data));
+        //ev.target.appendChild(document.getElementById(data));
+        let list = ev.target.closest('.cards_list');
+        let before = ev.target;
+        window.absolute = null;
+        console.log('opd');
+        console.log(document.body.getElementsByClassName('absolute')[0]);
+        removeElement(document.body.getElementsByClassName('absolute')[0]);
+        if (ev.target.classList.contains('cards_list')) {
+            before = null;
+        }
 
+        list.insertBefore(document.getElementById(data), before);
     }
 
     //drag
@@ -75,14 +145,14 @@
         let card = ev.closest('.card');
         let input = card.getElementsByClassName('textarea')[0];
         let title = input.value;
-        let id =  kanbanManager.saveColumnCard(title, card.id);
+        let id = kanbanManager.saveColumnCard(title, card.id);
         let card_container = ev.closest('.card-container');
         let input_block = card_container.getElementsByClassName('input_block')[0];
         removeElement(input_block);
         let cards_list = card_container.getElementsByClassName('cards_list')[0];
         cards_list.classList.add('card-list-normal');
         cards_list.classList.remove('card-list-with-input');
-        cards_list.innerHTML += `<div id="card_${id}" draggable="true" ondragover="return false;" ondragend="dragEnd(event);" ondragstart="drag(event)" class="white-card">
+        cards_list.innerHTML += `<div id="card_${id}" draggable="true"  ondragend="dragEnd(event);" ondragstart="drag(event)" onmouseover="not_al(event)" class="white-card">
                 ${title}
             </div>`;
         card_container.innerHTML += `<div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
@@ -128,10 +198,11 @@
 
     function saveColumnName(ev) {
         let card = ev.closest('.card');
+        card.setAttribute('onmouseover','not_al(event)');
         let input = card.getElementsByClassName('textarea')[0];
         let title = input.value;
         ev.closest('.card').id = kanbanManager.saveColumn(title);
-        card.getElementsByClassName('card-container')[0].innerHTML = `<div class="" style="    font-weight: 800;
+        card.getElementsByClassName('card-container')[0].innerHTML = `<div  style="    font-weight: 800;
      padding-bottom: 5px;">
             ${title}
         </div>
@@ -273,6 +344,7 @@
 
     window.onload = function () {
         initPage();
+        document.onmousemove = updatePosAb;
     }
 
 </script>

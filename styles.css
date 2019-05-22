@@ -5,6 +5,7 @@ body {
     background-size: cover;
     margin: 0 !important;
 
+    overflow: hidden;
 
     background-color: #8e44ad;
 
@@ -35,6 +36,10 @@ body {
     padding: 0 !important;
     height: 0 !important;
     overflow: hidden;
+}
+.absolute{
+    position: absolute !important;
+    z-index: 5;
 }
 .space_element::before,
 .space_element::after{
@@ -98,7 +103,12 @@ textarea {
     width: 100%;
     word-break: break-word;
 }
-
+[draggable] {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
 .white-card {
     background: white;
     border-radius: 3px;
@@ -107,10 +117,21 @@ textarea {
     color: black;
     font-weight: 400;
     padding: 10px;
-    transition: all 200ms;
+    transition: height 200ms, padding 200ms, margin 200ms;
     margin: 8px 2px;
+
 }
 
+.highlite-card::before{
+    content: open-quote;
+    width: 1px;
+    height: 10px;
+}
+
+.dragging{
+    opacity: 1 !important;
+    border: 1px solid blue;
+}
 .card {
     flex: 0 0 auto;
     width: 272px;
