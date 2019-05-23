@@ -39,11 +39,12 @@
             //console.log(ev.target);
             //console.log('+++++++++++');
             //console.log(window.last_el);
-                if (ev.target.classList.contains('task-block')) {
-                        if (window.last_mouse_over_element !== ev.target) {
-                        window.highlight = true;
-                        window.last_mouse_over_element = ev.target;
-                    }
+            if (ev.target.closest('.task-block')) {
+                if (window.last_mouse_over_element !== ev.target.closest('.task-block')) {
+                    removeHighlight();
+                    window.highlight = true;
+                    window.last_mouse_over_element = ev.target.closest('.task-block');
+                }
                 /**
                  * TODO highlight
                  * **/
@@ -59,19 +60,20 @@
                     window.last_el = ev.target;
                 }
                    */
-            } else {
+            } else if (ev.target.closest('.card')) {
                 /*console.log('нет, не белая карта, в таком случае ищем блок');
                 console.log(`${card.offsetTop}-${card.offsetTop + card.offsetHeight}
                 -${card.offsetLeft}-${card.offsetLeft + card.offsetWidth}
             -${initialY}-${initialX}
             `);
                 console.log(window.last_event.target.closest('.card'));*/
-                    let card = ev.target.closest('.card');
-                    if (window.last_mouse_over_element !== card) {
-                        console.log('gon');
-                        window.highlight = true;
-                        window.last_mouse_over_element = card;
-                    }
+                let card = ev.target.closest('.card');
+                if (window.last_mouse_over_element !== card) {
+                    removeHighlight();
+                    console.log('gon');
+                    window.highlight = true;
+                    window.last_mouse_over_element = card;
+                }
             }
         }
     }
@@ -110,7 +112,7 @@
 
             if (window.last_highlight) {
                 if (initialY < last_highlight.offsetTop || initialY > last_highlight.offsetTop + last_highlight.offsetHeight ||
-                        initialX < last_highlight.offsetLeft || initialX > last_highlight.offsetLeft + last_highlight.offsetWidth
+                    initialX < last_highlight.offsetLeft || initialX > last_highlight.offsetLeft + last_highlight.offsetWidth
                 ) {
                     removeHighlight();
                     window.last_mouse_over_element = null;
@@ -144,34 +146,28 @@
             offsetHeight = window.last_mouse_over_element.offsetHeight;
         window.last_highlight = {};
         if (window.last_mouse_over_element.classList.contains('card')) {
-            if ((offsetTop + offsetHeight / 2) <= initialY) {
-                console.log('bottom');
-                let cards_list = window.last_mouse_over_element.getElementsByClassName('cards_list')[0];
-                cards_list.innerHTML += `<div style="height: ${window.absolute.offsetHeight-20}px; margin-bottom: 8px;" class="removable place-to-insert norm-card">
+
+            console.log('kokokoko');
+
+            let cards_list = window.last_mouse_over_element.getElementsByClassName('cards_list')[0];
+            cards_list.innerHTML += `<div style="height: ${window.absolute.offsetHeight - 20}px; margin-bottom: 8px;" class="removable place-to-insert norm-card">
                         </div>`;
-                window.last_highlight.element = cards_list.getElementsByClassName('removable')[0];
-                offsetTop = window.last_mouse_over_element.offsetHeight / 2 + window.last_mouse_over_element.offsetTop;
-            } else if ((offsetTop + offsetHeight / 2) > initialY) {
-                console.log('header');
-                let place_to_insert = window.last_mouse_over_element.getElementsByClassName('place-to-insert')[0];
-                place_to_insert.classList.add('norm-card');
-                place_to_insert.style.height = `${window.absolute.offsetHeight-20}px`;
-                window.last_highlight.element = place_to_insert;
-                offsetHeight = window.last_mouse_over_element.offsetHeight / 2;
-            }
+            window.last_highlight.element = cards_list.getElementsByClassName('removable')[0];
+
+
         } else {
             console.log('goes_here');
             let place_to_insert = window.last_mouse_over_element.getElementsByClassName('place-to-insert')[0];
             place_to_insert.classList.add('norm-card');
-            place_to_insert.style = `${window.absolute.offsetHeight-20}px`;
+            place_to_insert.style.height = `${window.absolute.offsetHeight-20}px`;
             window.last_highlight.element = place_to_insert;
-            offsetTop = window.last_mouse_over_element.offsetTop;
-            offsetHeight = window.last_mouse_over_element.offsetHeight;
+            //offsetTop = window.last_mouse_over_element.offsetTop;
+            //offsetHeight = window.last_mouse_over_element.offsetHeight;
         }
 
 
-        window.last_highlight.offsetTop = offsetTop;
-        window.last_highlight.offsetHeight = offsetHeight;
+        window.last_highlight.offsetTop = window.last_mouse_over_element.offsetTop;
+        window.last_highlight.offsetHeight = window.last_mouse_over_element.offsetHeight;
         window.last_highlight.offsetLeft = window.last_mouse_over_element.offsetLeft;
         window.last_highlight.offsetWidth = window.last_mouse_over_element.offsetWidth;
 
@@ -203,14 +199,14 @@
         //window.absolute = e.target;
 
         e.target.closest('.task-block').removeAttribute('onmouseover');
-        e.target.closest('.task-block').removeEventListener('mouseover',mouseover_listener);
+        e.target.closest('.task-block').removeEventListener('mouseover', mouseover_listener);
 
         let clone_node = e.target.cloneNode(true);
         clone_node.classList.add('absolute');
 
         clone_node.removeAttribute('onmouseover');
         clone_node.removeAttribute('onmousedown');
-        clone_node.style.height = `${clone_node.offsetHeight-20}px`;
+        clone_node.style.height = `${clone_node.offsetHeight - 20}px`;
         clone_node.style.width = `${e.target.offsetWidth - 20}px`;
         clone_node.classList.add('nice-font');
         window.last = e.target;
@@ -299,7 +295,7 @@
 
     </div>`;
 
-            card_container.innerHTML += `<div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+            card_container.innerHTML += `<div class="grey-text-color" onmouseover="mouseover_listener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
             add
         </i>
@@ -308,7 +304,6 @@
         } else {
             alert('Заполните поле')
         }
-
     }
 
     function openTaskInput(ev) {
@@ -344,12 +339,12 @@
 
     function saveColumnName(ev) {
         let card = ev.closest('.card');
-        card.setAttribute('onmouseover', 'mouseover_listener(event)');
+
         let input = card.getElementsByClassName('textarea')[0];
         let title = input.value;
         if (title !== "") {
             ev.closest('.card').id = kanbanManager.saveColumn(title);
-            card.getElementsByClassName('card-container')[0].innerHTML = `<div  style="    font-weight: 800;
+            card.getElementsByClassName('card-container')[0].innerHTML = `<div onmouseover="mouseover_listener(event)" style="    font-weight: 800;
      padding-bottom: 5px;">
             ${title}
         </div>
@@ -358,7 +353,7 @@
 
         </div>
 
-        <div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+        <div class="grey-text-color" onmouseover="mouseover_listener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
             add
         </i>
