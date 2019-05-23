@@ -34,14 +34,16 @@
         //window.above = ev;
         //console.log(ev);
 
-        if (!window.absolute) {
+        if (window.absolute) {
             window.last_event = ev;
             //console.log(ev.target);
             //console.log('+++++++++++');
             //console.log(window.last_el);
-            if (ev.target.classList.contains('task-block')) {
-                window.highlight = true;
-                window.last_mouse_over_element = ev.target;
+                if (ev.target.classList.contains('task-block')) {
+                        if (window.last_mouse_over_element !== ev.target) {
+                        window.highlight = true;
+                        window.last_mouse_over_element = ev.target;
+                    }
                 /**
                  * TODO highlight
                  * **/
@@ -64,16 +66,19 @@
             -${initialY}-${initialX}
             `);
                 console.log(window.last_event.target.closest('.card'));*/
-                let card = ev.target.closest('.card');
-                window.highlight = true;
-                window.last_mouse_over_element = card;
+                    let card = ev.target.closest('.card');
+                    if (window.last_mouse_over_element !== card) {
+                        console.log('gon');
+                        window.highlight = true;
+                        window.last_mouse_over_element = card;
+                    }
             }
         }
     }
 
 
     function mousemove_listener(event) {
-        if (!window.absolute) {
+        if (window.absolute) {
             let eventDoc, doc, body;
 
 
@@ -98,104 +103,27 @@
             initialX = event.pageX;
             initialY = event.pageY;
 
-            //changing block position.
-            /*
+
             window.absolute.style.top = `${event.pageY - yOff}px`;
             window.absolute.style.left = `${event.pageX - xOff}px`;
-            */
 
 
             if (window.last_highlight) {
-                if ((initialY < last_highlight.offsetTop || initialY > last_highlight.offsetTop + last_highlight.offsetHeight) &&
-                    (initialX < last_highlight.offsetLeft || initialX > last_highlight.offsetLeft + last_highlight.offsetWidth)
+                if (initialY < last_highlight.offsetTop || initialY > last_highlight.offsetTop + last_highlight.offsetHeight ||
+                        initialX < last_highlight.offsetLeft || initialX > last_highlight.offsetLeft + last_highlight.offsetWidth
                 ) {
                     removeHighlight();
+                    window.last_mouse_over_element = null;
                 }
             }
             if (window.highlight) {
                 window.highlight = false;
                 addHighlight();
 
-                /*
-                console.log('*********');
-
-                if (window.last_el.classList.contains('card')) {
-                    if ((window.last_el.offsetTop + window.last_el.offsetHeight) / 2 <= initialY) {
-                        window.last_card_pos = -1;
-                        let cards_list = window.last_el.getElementsByClassName('cards_list')[0];
-                        cards_list.innerHTML += `<div style="height: ${window.absolute.offsetHeight}px;" class="removable place-to-insert norm-card">
-                        </div>`;
-                        window.last_highlight = document.body.getElementsByClassName('removable');
-
-
-
-                    } else {
-                        window.last_card_pos = 1;
-                        let place_to_insert = window.last_el.getElementsByClassName('place-to-insert')[0];
-                        place_to_insert.classList.add('norm-card');
-                        place_to_insert.style.height = `${window.absolute.offsetHeight}px`;
-                        window.last_highlight = place_to_insert;
-
-                    }
-                } else {
-
-                }
-*/
-
-            } else {
-
-                if (window.last_el.classList.contains('card')) {
-                    console.log('kokoko');
-
-                    /*
-                    if ((window.last_el.offsetTop + window.last_el.offsetHeight) / 2 <= initialY &&  window.last_card_pos >= 0) {
-
-                        removeElement(window.last_highlight);
-                        window.last_card_pos = -1;
-                        let place_to_insert = window.last_el.getElementsByClassName('place-to-insert')[0];
-                        place_to_insert.classList.add('norm-card');
-                        place_to_insert.style = `${window.absolute.offsetHeight}px`;
-                        window.last_highlight = place_to_insert;
-                    } else if ((window.last_el.offsetTop + window.last_el.offsetHeight) / 2 > initialY && -1 <= window.last_card_pos <= 0) {
-                        window.last_highlight.classList.remove('norm-card');
-                        window.last_highlight.style.height = '0';
-                        let cards_list = window.last_el.getElementsByClassName('cards_list')[0];
-                        cards_list.innerHTML += `<div style="height: ${window.absolute.offsetHeight}" class="removable place-to-insert norm-card">
-
-        </div>`;
-                        window.last_card_pos = 1;
-                        window.last_highlight = document.body.getElementsByClassName('removable');
-                    }
-                    */
-
-                    console.log(`${window.last_el.offsetTop + window.last_el.offsetHeight / 2}-${initialY}`);
-                    if ((window.last_el.offsetTop + window.last_el.offsetHeight / 2) <= initialY) {
-                        console.log('bottom');
-                    } else if ((window.last_el.offsetTop + window.last_el.offsetHeight / 2) > initialY) {
-                        console.log('header');
-                    }
-                }
-
 
             }
 
 
-            /*
-            if (window.last_event.target.classList.contains('white-card')) {
-                console.log('белая карта-' + `${window.last_event.target.offsetTop}-${window.last_event.target.offsetTop + window.last_event.target.offsetHeight}
-            -${window.last_event.target.offsetLeft}-${window.last_event.target.offsetLeft + window.last_event.target.offsetWidth}-${window.last_event.target.offsetHeight}
-            -${initialY}-${initialX}
-            `);
-            } else {
-                console.log('нет, не белая карта, в таком случае ищем блок');
-                console.log(window.last_event.target.closest('.card'));
-                let card = window.last_event.target.closest('.card');
-                console.log(`${card.offsetTop}-${card.offsetTop + card.offsetHeight}
-                -${card.offsetLeft}-${card.offsetLeft + card.offsetWidth}
-            -${initialY}-${initialX}
-            `);
-            }
-            */
         }
     }
 
@@ -212,66 +140,44 @@
     }
 
     function addHighlight() {
-        let offsetTop = window.highlight.offsetTop,
-            offsetHeight = window.highlight.offsetHeight;
-
-        if (window.highlight.classList.contains('card')) {
+        let offsetTop = window.last_mouse_over_element.offsetTop,
+            offsetHeight = window.last_mouse_over_element.offsetHeight;
+        window.last_highlight = {};
+        if (window.last_mouse_over_element.classList.contains('card')) {
             if ((offsetTop + offsetHeight / 2) <= initialY) {
                 console.log('bottom');
-                let cards_list = window.highlight.getElementsByClassName('cards_list')[0];
-                cards_list.innerHTML += `<div style="height: ${window.absolute.offsetHeight}px;" class="removable place-to-insert norm-card">
+                let cards_list = window.last_mouse_over_element.getElementsByClassName('cards_list')[0];
+                cards_list.innerHTML += `<div style="height: ${window.absolute.offsetHeight-20}px; margin-bottom: 8px;" class="removable place-to-insert norm-card">
                         </div>`;
-
-                offsetTop = window.highlight.offsetHeight / 2 + window.highlight.offsetTop;
+                window.last_highlight.element = cards_list.getElementsByClassName('removable')[0];
+                offsetTop = window.last_mouse_over_element.offsetHeight / 2 + window.last_mouse_over_element.offsetTop;
             } else if ((offsetTop + offsetHeight / 2) > initialY) {
                 console.log('header');
-                let place_to_insert = window.highlight.getElementsByClassName('place-to-insert')[0];
+                let place_to_insert = window.last_mouse_over_element.getElementsByClassName('place-to-insert')[0];
                 place_to_insert.classList.add('norm-card');
-                place_to_insert.style = `${window.absolute.offsetHeight}px`;
-
-                offsetHeight = window.highlight.offsetHeight / 2;
+                place_to_insert.style.height = `${window.absolute.offsetHeight-20}px`;
+                window.last_highlight.element = place_to_insert;
+                offsetHeight = window.last_mouse_over_element.offsetHeight / 2;
             }
         } else {
-            let place_to_insert = window.highlight.getElementsByClassName('place-to-insert')[0];
+            console.log('goes_here');
+            let place_to_insert = window.last_mouse_over_element.getElementsByClassName('place-to-insert')[0];
             place_to_insert.classList.add('norm-card');
-            place_to_insert.style = `${window.absolute.offsetHeight}px`;
-
-            offsetTop = window.highlight.offsetTop;
-            offsetHeight = window.highlight.offsetHeight;
-        }
-        window.last_highlight = {
-            element: window.highlight,
-            offsetTop: offsetTop,
-            offsetHeight: offsetHeight,
-            offsetLeft: window.highlight.offsetLeft,
-            offsetWidth: window.highlight.offsetWidth,
-        };
-    }
-
-    /*
-    function _dragEnd(ev) {
-        let list = ev.target.closest('.cards_list');
-        ev.target.classList.remove('hide');
-    }
-
-    function drop(ev) {
-        ev.preventDefault();
-        let data = ev.dataTransfer.getData("text");
-        //ev.target.appendChild(document.getElementById(data));
-        let list = ev.target.closest('.cards_list');
-        let before = ev.target;
-        window.absolute = null;
-        console.log('opd');
-        console.log(document.body.getElementsByClassName('absolute')[0]);
-        removeElement(document.body.getElementsByClassName('absolute')[0]);
-        if (ev.target.classList.contains('cards_list')) {
-            before = null;
+            place_to_insert.style = `${window.absolute.offsetHeight-20}px`;
+            window.last_highlight.element = place_to_insert;
+            offsetTop = window.last_mouse_over_element.offsetTop;
+            offsetHeight = window.last_mouse_over_element.offsetHeight;
         }
 
-        list.insertBefore(document.getElementById(data), before);
+
+        window.last_highlight.offsetTop = offsetTop;
+        window.last_highlight.offsetHeight = offsetHeight;
+        window.last_highlight.offsetLeft = window.last_mouse_over_element.offsetLeft;
+        window.last_highlight.offsetWidth = window.last_mouse_over_element.offsetWidth;
+
     }
 
-*/
+
     let active = false;
     let currentX;
     let currentY;
@@ -296,12 +202,15 @@
 
         //window.absolute = e.target;
 
+        e.target.closest('.task-block').removeAttribute('onmouseover');
+        e.target.closest('.task-block').removeEventListener('mouseover',mouseover_listener);
 
         let clone_node = e.target.cloneNode(true);
         clone_node.classList.add('absolute');
 
         clone_node.removeAttribute('onmouseover');
         clone_node.removeAttribute('onmousedown');
+        clone_node.style.height = `${clone_node.offsetHeight-20}px`;
         clone_node.style.width = `${e.target.offsetWidth - 20}px`;
         clone_node.classList.add('nice-font');
         window.last = e.target;
@@ -330,40 +239,7 @@
 
     }
 
-    /*
 
-    function dragEnd(e) {
-        console.log('end');
-        initialX = currentX;
-        initialY = currentY;
-        e.target.classList.remove('hide');
-        window.absolute = null;
-        active = false;
-    }
-
-
-    function drag(e) {
-        if (active) {
-
-            e.preventDefault();
-
-            if (e.type === "touchmove") {
-                currentX = e.touches[0].clientX - initialX;
-                currentY = e.touches[0].clientY - initialY;
-            } else {
-                currentX = e.clientX - initialX;
-                currentY = e.clientY - initialY;
-            }
-
-            xOffset = currentX;
-            yOffset = currentY;
-
-            console.log(xOff + " " + yOff);
-            setTranslate(currentX, currentY, window.absolute);
-        }
-    }
-
-*/
     function setTranslate(xPos, yPos, el) {
         el.style.transform = "translate3d(" + xPos - xOff + "px, " + yPos - yOff + "px, 0)";
     }
