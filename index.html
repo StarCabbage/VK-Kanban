@@ -25,14 +25,50 @@
         ev.preventDefault();
     }
 
+    window.changed = false;
+    window.last_el = null;
+
+
     function not_al(ev) {
         //window.above = ev;
-        console.log(ev);
+        //console.log(ev);
+
+        if (window.absolute) {
+            window.last_event = ev;
+            console.log(ev.target);
+            console.log('+++++++++++');
+            console.log(window.last_el);
+            if (window.last_event.target.classList.contains('white-card')) {
+                console.log('белая карта-' + `${window.last_event.target.offsetTop}-${window.last_event.target.offsetTop + window.last_event.target.offsetHeight}
+            -${window.last_event.target.offsetLeft}-${window.last_event.target.offsetLeft + window.last_event.target.offsetWidth}-${window.last_event.target.offsetHeight}
+            -${initialY}-${initialX}
+            `);
+                if (window.last_el !== ev.target) {
+                    window.changed = true;
+                    window.last_el = ev.target;
+                }
+            } else {
+                console.log('нет, не белая карта, в таком случае ищем блок');
+                console.log(window.last_event.target.closest('.card'));
+                let card = window.last_event.target.closest('.card');
+                console.log(`${card.offsetTop}-${card.offsetTop + card.offsetHeight}
+                -${card.offsetLeft}-${card.offsetLeft + card.offsetWidth}
+            -${initialY}-${initialX}
+            `);
+                if (last_el !== card) {
+                    window.changed = true;
+                    window.last_el = card;
+                }
+            }
+        }
     }
 
     window.absolute = null;
-
-    function drag(ev) {
+    window.last = null;
+    window.last_event = null;
+    window.last_card_pos = 0;
+    window.highlight = false;
+    function _drag(ev) {
         //ev.dataTransfer.effectAllowed = 'move';
         console.log(ev);
         //list.classList.add('no-insert');
@@ -51,6 +87,7 @@
             document.body.appendChild(clone_node);
 
             window.absolute = clone_node;
+            window.event = null;
 
             //clone_node.classList.add('absolute');
             //document.appendChild(clone_node);
@@ -59,6 +96,8 @@
         //this.classList.add('dragging');
 
     }
+
+    window.last_highlight = null;
 
     function updatePosAb(event) {
         if (window.absolute) {
@@ -82,12 +121,87 @@
                     (doc && doc.clientTop || body && body.clientTop || 0);
             }
 
-            window.absolute.style.top = `${event.pageY}px`;
-            window.absolute.style.left = `${event.pageX}px`;
+            initialX = event.pageX;
+            initialY = event.pageY;
+            window.absolute.style.top = `${event.pageY - yOff}px`;
+            window.absolute.style.left = `${event.pageX - xOff}px`;
+
+            console.log(`changed:${changed}`);
+            if (changed) {
+                console.log('*********');
+                if (window.last_highlight) {
+                    if (window.last_highlight.classList.contains('removable')) {
+                        removeElement(window.last_highlight);
+                    } else {
+                        window.last_highlight.classList.remove('norm-card');
+                        window.last_highlight.style.height = '0';
+                    }
+                }
+                if (window.last_el.classList.contains('card')) {
+                    if ((window.last_el.offsetTop + window.last_el.offsetHeight) / 2 <= initialY) {
+                        window.last_card_pos = -1;
+                        let cards_list = window.last_el.getElementsByClassName('cards_list')[0];
+                        cards_list.innerHTML += `<div style="height: ${window.absolute.offsetHeight}px;" class="removable place-to-insert norm-card">
+                        </div>`;
+                        window.last_highlight = document.body.getElementsByClassName('removable');
+
+
+
+                    } else {
+                        window.last_card_pos = 1;
+                        let place_to_insert = window.last_el.getElementsByClassName('place-to-insert')[0];
+                        place_to_insert.classList.add('norm-card');
+                        place_to_insert.style.height = `${window.absolute.offsetHeight}px`;
+                        window.last_highlight = place_to_insert;
+
+                    }
+                } else {
+
+                }
+
+                window.changed = false;
+            } else {
+                if (window.last_el.classList.contains('card')) {
+                    if ((window.last_el.offsetTop + window.last_el.offsetHeight) / 2 <= initialY &&  window.last_card_pos >= 0) {
+                        removeElement(window.last_highlight);
+                        window.last_card_pos = -1;
+                        let place_to_insert = window.last_el.getElementsByClassName('place-to-insert')[0];
+                        place_to_insert.classList.add('norm-card');
+                        place_to_insert.style = `${window.absolute.offsetHeight}px`;
+                        window.last_highlight = place_to_insert;
+                    } else if ((window.last_el.offsetTop + window.last_el.offsetHeight) / 2 > initialY && -1 <= window.last_card_pos <= 0) {
+                        window.last_highlight.classList.remove('norm-card');
+                        window.last_highlight.style.height = '0';
+                        let cards_list = window.last_el.getElementsByClassName('cards_list')[0];
+                        cards_list.innerHTML += `<div style="height: ${window.absolute.offsetHeight}" class="removable place-to-insert norm-card">
+
+        </div>`;
+                        window.last_card_pos = 1;
+                        window.last_highlight = document.body.getElementsByClassName('removable');
+                    }
+                }
+            }
+
+            /*
+            if (window.last_event.target.classList.contains('white-card')) {
+                console.log('белая карта-' + `${window.last_event.target.offsetTop}-${window.last_event.target.offsetTop + window.last_event.target.offsetHeight}
+            -${window.last_event.target.offsetLeft}-${window.last_event.target.offsetLeft + window.last_event.target.offsetWidth}-${window.last_event.target.offsetHeight}
+            -${initialY}-${initialX}
+            `);
+            } else {
+                console.log('нет, не белая карта, в таком случае ищем блок');
+                console.log(window.last_event.target.closest('.card'));
+                let card = window.last_event.target.closest('.card');
+                console.log(`${card.offsetTop}-${card.offsetTop + card.offsetHeight}
+                -${card.offsetLeft}-${card.offsetLeft + card.offsetWidth}
+            -${initialY}-${initialX}
+            `);
+            }
+            */
         }
     }
 
-    function dragEnd(ev) {
+    function _dragEnd(ev) {
         let list = ev.target.closest('.cards_list');
         ev.target.classList.remove('hide');
     }
@@ -108,6 +222,103 @@
 
         list.insertBefore(document.getElementById(data), before);
     }
+
+
+    let active = false;
+    let currentX;
+    let currentY;
+    let initialX;
+    let initialY;
+    let xOffset = 0;
+    let yOffset = 0;
+    let xOff = 0;
+    let yOff = 0;
+
+    function dragStart(e) {
+        console.log('opa');
+        console.log(e);
+        console.log('opa');
+        if (e.type === "touchstart") {
+            initialX = e.touches[0].clientX - xOffset;
+            initialY = e.touches[0].clientY - yOffset;
+        } else {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+        }
+
+        //window.absolute = e.target;
+
+
+        let clone_node = e.target.cloneNode(true);
+        clone_node.classList.add('absolute');
+
+        clone_node.removeAttribute('onmouseover');
+        clone_node.removeAttribute('onmousedown');
+        clone_node.style.width = `${e.target.offsetWidth - 20}px`;
+        clone_node.classList.add('nice-font');
+        window.last = e.target;
+        window.event = null;
+        xOff = e.offsetX;
+        yOff = e.offsetY;
+        //console.log(`${initialX}-${xOff}-${initialX - xOff}`);
+
+        //clone_node.style.transform ="rotate(7deg)";
+        //clone_node.style.width = ev.
+        document.body.appendChild(clone_node);
+        //clone_node.removeEventListener('mousedown', dragStart);
+        //clone_node.addEventListener('mouseover', not_al);
+        //clone_node.removeEventListener('mouseover', not_al);
+        //clone_node.removeEventListener('mouseover', not_al, true);
+        clone_node.style.left = `${initialX - xOff}px`;
+        clone_node.style.top = `${initialY - yOff}px`;
+        window.absolute = clone_node;
+
+        //clone_node.classList.add('absolute');
+        //document.appendChild(clone_node);
+        e.target.classList.add('hide');
+
+        active = true;
+
+
+    }
+    /*
+
+    function dragEnd(e) {
+        console.log('end');
+        initialX = currentX;
+        initialY = currentY;
+        e.target.classList.remove('hide');
+        window.absolute = null;
+        active = false;
+    }
+
+
+    function drag(e) {
+        if (active) {
+
+            e.preventDefault();
+
+            if (e.type === "touchmove") {
+                currentX = e.touches[0].clientX - initialX;
+                currentY = e.touches[0].clientY - initialY;
+            } else {
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+            }
+
+            xOffset = currentX;
+            yOffset = currentY;
+
+            console.log(xOff + " " + yOff);
+            setTranslate(currentX, currentY, window.absolute);
+        }
+    }
+
+*/
+    function setTranslate(xPos, yPos, el) {
+        el.style.transform = "translate3d(" + xPos - xOff + "px, " + yPos - yOff + "px, 0)";
+    }
+
 
     //drag
 
@@ -145,23 +356,33 @@
         let card = ev.closest('.card');
         let input = card.getElementsByClassName('textarea')[0];
         let title = input.value;
-        let id = kanbanManager.saveColumnCard(title, card.id);
-        let card_container = ev.closest('.card-container');
-        let input_block = card_container.getElementsByClassName('input_block')[0];
-        removeElement(input_block);
-        let cards_list = card_container.getElementsByClassName('cards_list')[0];
-        cards_list.classList.add('card-list-normal');
-        cards_list.classList.remove('card-list-with-input');
-        cards_list.innerHTML += `<div id="card_${id}" draggable="true"  ondragend="dragEnd(event);" ondragstart="drag(event)" onmouseover="not_al(event)" class="white-card">
-                ${title}
-            </div>`;
-        card_container.innerHTML += `<div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+        if (title !== "") {
+            let id = kanbanManager.saveColumnCard(title, card.id);
+            let card_container = ev.closest('.card-container');
+            let input_block = card_container.getElementsByClassName('input_block')[0];
+            removeElement(input_block);
+            let cards_list = card_container.getElementsByClassName('cards_list')[0];
+            cards_list.classList.add('card-list-normal');
+            cards_list.classList.remove('card-list-with-input');
+            cards_list.innerHTML += `<div id="card_${id}">
+        <div class="place-to-insert">
+
+        </div>
+        <div  onmousedown="dragStart(event)" onmouseup="dragEnd(event)" onmouseover="not_al(event)" class=" white-card">
+            ${title}
+        </div>
+
+    </div>`;
+
+            card_container.innerHTML += `<div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
             add
         </i>
             <div>Добавить ещё одну карточку</div>
         </div>`;
-
+        } else {
+            alert('Заполните поле')
+        }
 
     }
 
@@ -198,15 +419,16 @@
 
     function saveColumnName(ev) {
         let card = ev.closest('.card');
-        card.setAttribute('onmouseover','not_al(event)');
+        card.setAttribute('onmouseover', 'not_al(event)');
         let input = card.getElementsByClassName('textarea')[0];
         let title = input.value;
-        ev.closest('.card').id = kanbanManager.saveColumn(title);
-        card.getElementsByClassName('card-container')[0].innerHTML = `<div  style="    font-weight: 800;
+        if (title !== "") {
+            ev.closest('.card').id = kanbanManager.saveColumn(title);
+            card.getElementsByClassName('card-container')[0].innerHTML = `<div  style="    font-weight: 800;
      padding-bottom: 5px;">
             ${title}
         </div>
-        <div class="cards_list card-list-normal" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div class="cards_list card-list-normal" >
 
 
         </div>
@@ -217,7 +439,9 @@
         </i>
             <div>Добавить ещё одну карточку</div>
         </div>`;
-
+        } else {
+            alert("Заполните поле")
+        }
     }
 
     function addElement(parentId, elementTag, elementId, html) {
@@ -345,6 +569,47 @@
     window.onload = function () {
         initPage();
         document.onmousemove = updatePosAb;
+        document.onmouseup = up;
+    };
+
+    function up(ev) {
+        //console.log(ev);
+
+        console.log('up');
+        let pipa = document.body.getElementsByClassName('absolute')[0];
+        console.log(pipa);
+        if (pipa) {
+            pipa.classList.add('hide');
+
+            setTimeout(function () {
+                removeElement(pipa);
+                window.absolute = null;
+                if (is_outside()) {
+                    window.last.classList.remove('hide');
+                }
+            }, 200);
+
+        }
+    }
+
+    function is_outside() {
+        console.log(window.last_event);
+
+        if (window.last_event.target.classList.contains('white-card')) {
+            console.log('белая карта')
+        } else {
+            console.log('нет, не белая карта, в таком случае ищем блок');
+            console.log(window.last_event.target.closest('card'));
+
+        }
+
+        if (!window.last_event) return true;
+
+        let targetElementWidth = window.last_event.target.offsetWidth;
+        let targetElementHeight = window.last_event.target.offsetHeight;
+        let targetElementLeft = window.last_event.target.offsetLeft;
+        let targetElementTop = window.last_event.target.offsetTop;
+        return !(targetElementTop <= initialY <= targetElementTop + targetElementHeight && targetElementLeft <= initialX <= targetElementLeft + targetElementWidth);
     }
 
 </script>

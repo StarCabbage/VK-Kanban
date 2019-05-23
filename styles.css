@@ -36,10 +36,13 @@ body {
     padding: 0 !important;
     height: 0 !important;
     overflow: hidden;
+    pointer-events: none;
 }
 .absolute{
     position: absolute !important;
     z-index: 5;
+    pointer-events: none;
+    max-height: 80px;
 }
 .space_element::before,
 .space_element::after{
@@ -64,6 +67,7 @@ textarea {
 
 ::-webkit-scrollbar {
     visibility: hidden;
+    width: 0;
 }
 
 .scrolling-wrapper-flexbox::-webkit-scrollbar-track {
@@ -109,6 +113,20 @@ textarea {
     -webkit-user-select: none;
     user-select: none;
 }
+
+.norm-card{
+    background: #C9D2D9;
+    padding: 0;
+    height: 0;
+    -webkit-box-shadow: 0 0px;
+    box-shadow: 0 0px;
+    transition: height 100ms, padding 100ms, margin 100ms;
+    margin: 8px 2px 0;
+    color: black;
+    font-weight: 400;
+    border-radius: 3px;
+}
+
 .white-card {
     background: white;
     border-radius: 3px;
