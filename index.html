@@ -184,9 +184,40 @@
     let yOffset = 0;
     let xOff = 0;
     let yOff = 0;
+    let time_out = false;
+
+    function selectText(node) {
+
+
+        if (document.body.createTextRange) {
+            const range = document.body.createTextRange();
+            range.moveToElementText(node);
+            range.select();
+        } else if (window.getSelection) {
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(node);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } else {
+            console.warn("Could not select text in node: Unsupported browser.");
+        }
+    }
+
+    window.timer_time_out = null;
 
     function dragStart(e) {
-        if (e.button === 0) {
+        if (e.button === 0 && e.ctrlKey) {
+            window.time_out = false;
+            if (window.timer_time_out) {
+                clearTimeout(window.timer_time_out);
+            }
+            window.timer_time_out = setTimeout(function () {
+                window.time_out = true;
+            }, 400);
+            if (e.target.classList.contains('selectable-all')) {
+                e.target.classList.remove('selectable-all');
+            }
             console.log('opa');
             console.log(e);
             console.log('opa');
@@ -236,6 +267,15 @@
 
             active = true;
 
+        } else {
+
+            if (!e.target.classList.contains('selectable-all')) {
+                e.target.classList.add('selectable-all');
+            } else {
+                //e.target.classList.remove('selectable-all');
+            }
+            selectText(e.target);
+
         }
 
     }
@@ -279,18 +319,30 @@
     }
 
     function saveTaskName(ev) {
-        let card = ev.closest('.card');
-        let input = card.getElementsByClassName('textarea')[0];
-        let title = input.value;
-        if (title !== "") {
-            let id = kanbanManager.saveColumnCard(title, card.id);
-            let card_container = ev.closest('.card-container');
-            let input_block = card_container.getElementsByClassName('input_block')[0];
-            removeElement(input_block);
-            let cards_list = card_container.getElementsByClassName('cards_list')[0];
-            cards_list.classList.add('card-list-normal');
-            cards_list.classList.remove('card-list-with-input');
-            cards_list.innerHTML += `<div id="card_${id}"  onmouseover="mouseover_listener(event)"  class="task-block">
+        console.log(ev);
+        if (!event.shiftKey && ev.keyCode === 13 || !ev.type.localeCompare('click')) {
+
+
+            let card = ev.target.closest('.card');
+            let input = card.getElementsByClassName('textarea')[0];
+            let title = input.value;
+
+            title.replace(/^\s*\n/gm, "");
+            if (isStringEmpty(title)) {
+                title = "";
+                console.log('go');
+                input.value = "";
+            }
+            console.log(title);
+            if (title !== "") {
+                let id = kanbanManager.saveColumnCard(title, card.id);
+                let card_container = ev.target.closest('.card-container');
+                let input_block = card_container.getElementsByClassName('input_block')[0];
+                removeElement(input_block);
+                let cards_list = card_container.getElementsByClassName('cards_list')[0];
+                cards_list.classList.add('card-list-normal');
+                cards_list.classList.remove('card-list-with-input');
+                cards_list.innerHTML += `<div id="card_${id}"  onmouseover="mouseover_listener(event)"  class="task-block">
         <div class="place-to-insert">
 
         </div>
@@ -300,16 +352,18 @@
 
     </div>`;
 
-            card_container.innerHTML += `<div class="grey-text-color" onmouseover="mouseover_listener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+                card_container.innerHTML += `<div class="grey-text-color" onmouseover="mouseover_listener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
             add
         </i>
             <div>Добавить ещё одну карточку</div>
         </div>`;
-        } else {
-            alert('Заполните поле')
+            } else {
+                alert('Заполните поле');
+            }
         }
     }
+
 
     function openTaskInput(ev) {
         let card_container = ev.closest('.card-container');
@@ -321,7 +375,7 @@
                 <div class="white-card" style="color: grey;
 
     font-weight: 300;">
-  <textarea type="text" class="textarea" id="inp" placeholder="Введите название карточки" style="
+  <textarea type="text" class="textarea" id="inp" onkeyup="saveTaskName(event)" placeholder="Введите название карточки" style="
 
 
 "></textarea>
@@ -334,7 +388,7 @@
             <div class="grey-text-color" style="display: flex;  font-weight: 400; justify-content: space-between;
     align-items: center;">
 
-                <div class="green-flat-button save_column_name" onclick="saveTaskName(this)">Добавить карточку</div>
+                <div class="green-flat-button save_column_name" onclick="saveTaskName(event)">Добавить карточку</div>
                 <i class="material-icons close_column" onclick="closeTaskInput(this);" style="padding-right: 5px;">
                     close
                 </i>
@@ -342,14 +396,26 @@
             </div></div>`;
     }
 
-    function saveColumnName(ev) {
-        let card = ev.closest('.card');
+    function isStringEmpty(str) {
+        return (!str || /^\s*$/.test(str));
+    }
 
-        let input = card.getElementsByClassName('textarea')[0];
-        let title = input.value;
-        if (title !== "") {
-            ev.closest('.card').id = kanbanManager.saveColumn(title);
-            card.getElementsByClassName('card-container')[0].innerHTML = `<div  style="    font-weight: 800;
+    function saveColumnName(ev) {
+        if (!event.shiftKey && ev.keyCode === 13 || !ev.type.localeCompare('click')) {
+            let card = ev.target.closest('.card');
+
+            let input = card.getElementsByClassName('textarea')[0];
+            let title = input.value;
+            console.log(title);
+            title.replace(/^\s*\n/gm, "");
+            if (isStringEmpty(title)) {
+                title = "";
+                console.log('go');
+                input.value = "";
+            }
+            if (title !== "") {
+                ev.target.closest('.card').id = kanbanManager.saveColumn(title);
+                card.getElementsByClassName('card-container')[0].innerHTML = `<div class="selectable" style="    font-weight: 800;
      padding-bottom: 5px;">
             ${title}
         </div>
@@ -364,8 +430,9 @@
         </i>
             <div>Добавить ещё одну карточку</div>
         </div>`;
-        } else {
-            alert("Заполните поле")
+            } else {
+                alert("Заполните поле")
+            }
         }
     }
 
@@ -389,6 +456,16 @@
             }
         }
 
+        writeLocal() {
+            console.log('writelocal*******');
+            window.localStorage.setItem('data',JSON.stringify({
+                columns: this.columns,
+                columnArray: this.columnArray,
+                cardsArray: this.cardsArray,
+                columnsData: this.columnsData
+            }))
+        }
+
         saveColumnCard(name, columnId) {
             this.cardsArray.push(name);
             let cardId = this.cardsArray.length - 1;
@@ -396,6 +473,7 @@
 
             if (!this.columnsData[num]) this.columnsData[num] = [];
             this.columnsData[num].push(cardId);
+            this.writeLocal();
             return cardId;
         }
 
@@ -407,6 +485,7 @@
             this.appendColumnCard(id, newColumnId, newPosition);
 
             console.log(this.columnsData);
+            this.writeLocal();
         }
 
         removeColumnCard(id, columnId) {
@@ -423,16 +502,18 @@
             let index = position;
             if (!this.columnsData[num]) this.columnsData[num] = [];
             this.columnsData[num].splice(index, 0, card_id);
+
         }
 
         saveColumn(name) {
             this.columnArray.push(name);
+            this.writeLocal();
             return `column_${this.columnArray.length}`;
         }
 
         addColumn() {
             let columnButtonElement = `<div class="card button column">
-                                        <div class="card-container nice-font">
+                                        <div class="card-container selectable nice-font">
                                             <div class="grey-text-color" style="display: flex;  font-weight: 400;
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
                                                                                         add
@@ -453,7 +534,7 @@
                 <div class="white-card" style="color: grey;
 
     font-weight: 300;">
-  <textarea type="text" class="textarea" id="inp" placeholder="Введите название колонки" style="
+  <textarea type="text" class="textarea" id="inp" placeholder="Введите название колонки" onkeyup="saveColumnName(event)" style="
 
 
 "></textarea>
@@ -466,7 +547,7 @@
             <div class="grey-text-color" style="display: flex;  font-weight: 400; justify-content: space-between;
     align-items: center;">
 
-                <div class="green-flat-button save_column_name" onclick="saveColumnName(this)">Добавить колонку</div>
+                <div class="green-flat-button save_column_name" onclick="saveColumnName(event)">Добавить колонку</div>
                 <i class="material-icons close_column" onclick="closeColumn(this);" style="padding-right: 5px;">
                     close
                 </i>
@@ -490,6 +571,7 @@
     function lock_right_click(e) {
         e.preventDefault();
     }
+
     function autoExpandTextArea() {
         document.addEventListener('input', function (event) {
             if (event.target.tagName.toLowerCase() !== 'textarea') return;
@@ -518,12 +600,14 @@
         setBackground(variables.backgroundPath, '20%', '60%');
         autoExpandTextArea();
         window.kanbanManager = new KanbanManager();
+        document.onmousemove = mousemove_listener;
+        document.onmouseup = up;
+
     }
 
     window.onload = function () {
         initPage();
-        document.onmousemove = mousemove_listener;
-        document.onmouseup = up;
+
     };
 
     function up(ev) {
@@ -537,20 +621,7 @@
             document.body.style.pointerEvents = "none";
             let highlight_cards = document.getElementsByClassName('norm-card');
             console.log(highlight_cards);
-            if (highlight_cards.length === 0) {
-                //let white_card = window.touched_element.getElementsByClassName('white-card')[0];
-                //console.log(window.touched_element.getElementsByClassName('white-card'));
-                //console.log('white card');
-                //console.log(JSON.stringify(white_card));
-                document.getElementById(window.touched_element.id).getElementsByClassName('white-card')[0].classList.remove('hide'); //это из-за веселого бага)))
-                document.getElementById(window.touched_element.id).setAttribute('onmouseover', "mouseover_listener(event)");
-                document.getElementById(window.touched_element.id).addEventListener('mouseover', mouseover_listener);
-                window.touch_card.classList.remove('hide');
-                window.touch_card.classList.remove('hide');
-
-
-            } else {
-
+            if (highlight_cards.length !== 0 && window.time_out) {
                 //console.log(window.touched_element.id);
                 let touched_element = document.getElementById(window.touched_element.id);
                 let clone_node = touched_element.cloneNode(true);
@@ -583,6 +654,20 @@
                     kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, position);
                 }
 
+
+            } else {
+
+                //let white_card = window.touched_element.getElementsByClassName('white-card')[0];
+                //console.log(window.touched_element.getElementsByClassName('white-card'));
+                //console.log('white card');
+                //console.log(JSON.stringify(white_card));
+                document.getElementById(window.touched_element.id).getElementsByClassName('white-card')[0].classList.remove('hide'); //это из-за веселого бага)))
+                document.getElementById(window.touched_element.id).setAttribute('onmouseover', "mouseover_listener(event)");
+                document.getElementById(window.touched_element.id).addEventListener('mouseover', mouseover_listener);
+                window.touch_card.classList.remove('hide');
+                window.touch_card.classList.remove('hide');
+
+
             }
             removeHighlight();
             let absolute = window.absolute;
@@ -596,7 +681,7 @@
                 window.touch_card = null;
                 window.touched_element = null;
                 window.absolute = null;
-                document.body.style.pointerEvents = "all";
+                document.body.style.pointerEvents = "auto";
             }, 200);
 
 
