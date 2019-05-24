@@ -186,55 +186,57 @@
     let yOff = 0;
 
     function dragStart(e) {
-        console.log('opa');
-        console.log(e);
-        console.log('opa');
-        if (e.type === "touchstart") {
-            initialX = e.touches[0].clientX - xOffset;
-            initialY = e.touches[0].clientY - yOffset;
-        } else {
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
+        if (e.button === 0) {
+            console.log('opa');
+            console.log(e);
+            console.log('opa');
+            if (e.type === "touchstart") {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+            } else {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+            }
+
+            window.touched_element = e.target.closest('.task-block');
+            console.log(window.touched_element);
+            window.touch_card = e.target;
+            //window.absolute = e.target;
+
+            e.target.closest('.task-block').removeAttribute('onmouseover');
+            e.target.closest('.task-block').removeEventListener('mouseover', mouseover_listener);
+
+            let clone_node = e.target.cloneNode(true);
+            clone_node.classList.add('absolute');
+
+            clone_node.removeAttribute('onmouseover');
+            clone_node.removeAttribute('onmousedown');
+            clone_node.style.height = `${clone_node.offsetHeight - 20}px`;
+            clone_node.style.width = `${e.target.offsetWidth - 20}px`;
+            clone_node.classList.add('nice-font');
+            window.event = null;
+            xOff = e.offsetX;
+            yOff = e.offsetY;
+            //console.log(`${initialX}-${xOff}-${initialX - xOff}`);
+
+            //clone_node.style.transform ="rotate(7deg)";
+            //clone_node.style.width = ev.
+            document.body.appendChild(clone_node);
+            //clone_node.removeEventListener('mousedown', dragStart);
+            //clone_node.addEventListener('mouseover', mouseover_listener);
+            //clone_node.removeEventListener('mouseover', mouseover_listener);
+            //clone_node.removeEventListener('mouseover', mouseover_listener, true);
+            clone_node.style.left = `${initialX - xOff}px`;
+            clone_node.style.top = `${initialY - yOff}px`;
+            window.absolute = clone_node;
+
+            //clone_node.classList.add('absolute');
+            //document.appendChild(clone_node);
+            e.target.classList.add('hide');
+
+            active = true;
+
         }
-
-        window.touched_element = e.target.closest('.task-block');
-        console.log(window.touched_element);
-        window.touch_card = e.target;
-        //window.absolute = e.target;
-
-        e.target.closest('.task-block').removeAttribute('onmouseover');
-        e.target.closest('.task-block').removeEventListener('mouseover', mouseover_listener);
-
-        let clone_node = e.target.cloneNode(true);
-        clone_node.classList.add('absolute');
-
-        clone_node.removeAttribute('onmouseover');
-        clone_node.removeAttribute('onmousedown');
-        clone_node.style.height = `${clone_node.offsetHeight - 20}px`;
-        clone_node.style.width = `${e.target.offsetWidth - 20}px`;
-        clone_node.classList.add('nice-font');
-        window.event = null;
-        xOff = e.offsetX;
-        yOff = e.offsetY;
-        //console.log(`${initialX}-${xOff}-${initialX - xOff}`);
-
-        //clone_node.style.transform ="rotate(7deg)";
-        //clone_node.style.width = ev.
-        document.body.appendChild(clone_node);
-        //clone_node.removeEventListener('mousedown', dragStart);
-        //clone_node.addEventListener('mouseover', mouseover_listener);
-        //clone_node.removeEventListener('mouseover', mouseover_listener);
-        //clone_node.removeEventListener('mouseover', mouseover_listener, true);
-        clone_node.style.left = `${initialX - xOff}px`;
-        clone_node.style.top = `${initialY - yOff}px`;
-        window.absolute = clone_node;
-
-        //clone_node.classList.add('absolute');
-        //document.appendChild(clone_node);
-        e.target.classList.add('hide');
-
-        active = true;
-
 
     }
 
@@ -288,7 +290,7 @@
             let cards_list = card_container.getElementsByClassName('cards_list')[0];
             cards_list.classList.add('card-list-normal');
             cards_list.classList.remove('card-list-with-input');
-            cards_list.innerHTML += `<div id="card_${id}"  onmouseover="mouseover_listener(event)" class="task-block">
+            cards_list.innerHTML += `<div id="card_${id}"  onmouseover="mouseover_listener(event)"  class="task-block">
         <div class="place-to-insert">
 
         </div>
@@ -485,6 +487,9 @@
 
     };
 
+    function lock_right_click(e) {
+        e.preventDefault();
+    }
     function autoExpandTextArea() {
         document.addEventListener('input', function (event) {
             if (event.target.tagName.toLowerCase() !== 'textarea') return;
