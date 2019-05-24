@@ -5,10 +5,6 @@ window.last_mouse_over_element = null;
 window.timer_time_out = null;
 
 
-
-
-
-
 /**Listeners */
 function mouseoverLocalListener(event) {
 
@@ -126,7 +122,7 @@ function mousedownLocalListener(event) {
         clone_node.style.left = `${initialX - xOff}px`;
         clone_node.style.top = `${initialY - yOff}px`;
         window.absoluteCard = clone_node;
-
+        document.getElementsByClassName('absolute-trash')[0].classList.add('transform-trash');
 
         event.target.classList.add('invisible-card');
 
@@ -136,7 +132,7 @@ function mousedownLocalListener(event) {
 
         if (!event.target.classList.contains('selectable-card')) {
             event.target.classList.add('selectable-card');
-        }else {
+        } else {
             event.target.classList.remove('selectable-card');
         }
         selectText(event.target);
@@ -148,61 +144,63 @@ function mousedownLocalListener(event) {
 function mouseupWindowListener(event) {
 
 
-
     if (window.absoluteCard) {
         window.absoluteCard.classList.add('absolute-invisible-card');
 
         document.body.style.pointerEvents = "none";
         let highlight_cards = document.getElementsByClassName('highlight-card');
-
-        if (highlight_cards.length !== 0 && window.time_out) {
-
+        if (event.target.closest('.absolute-trash')) {
             let touched_element = document.getElementById(window.touched_element.id);
-            let clone_node = touched_element.cloneNode(true);
             let oldColumnId = touched_element.closest('.column').id;
+            window.kanbanManager.removeColumnCard(window.touched_element.id, oldColumnId);
             removeElement(touched_element);
-            let x_column = highlight_cards[0].closest('.column');
-            let list_possible_highlights = x_column.getElementsByClassName('place-to-insert');
-            let count = 0;
-            let position = -1;
-            for (let element of list_possible_highlights) {
-                if (element !== highlight_cards[0]) {
-                    count += 1;
-                } else {
-                    position = count;
-                    break;
-                }
-            }
-            let card_list = x_column.getElementsByClassName('cards_list')[0];
-            clone_node.getElementsByClassName('white-card')[0].classList.remove('invisible-card');
-            clone_node.setAttribute('onmouseover', "mouseoverLocalListener(event)");
-            clone_node.addEventListener('mouseover', mouseoverLocalListener);
-            if (position === -1) {
-
-
-                card_list.appendChild(clone_node);
-                kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, count + 1);
-            } else {
-                let x_task_blocks = x_column.getElementsByClassName('task-block');
-                card_list.insertBefore(clone_node, x_task_blocks[position]);
-                kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, position);
-            }
-
-
         } else {
+            if (highlight_cards.length !== 0 && window.time_out) {
+                let touched_element = document.getElementById(window.touched_element.id);
+                let clone_node = touched_element.cloneNode(true);
+                let oldColumnId = touched_element.closest('.column').id;
+                removeElement(touched_element);
+                let x_column = highlight_cards[0].closest('.column');
+                let list_possible_highlights = x_column.getElementsByClassName('place-to-insert');
+                let count = 0;
+                let position = -1;
+                for (let element of list_possible_highlights) {
+                    if (element !== highlight_cards[0]) {
+                        count += 1;
+                    } else {
+                        position = count;
+                        break;
+                    }
+                }
+                let card_list = x_column.getElementsByClassName('cards_list')[0];
+                clone_node.getElementsByClassName('white-card')[0].classList.remove('invisible-card');
+                clone_node.setAttribute('onmouseover', "mouseoverLocalListener(event)");
+                clone_node.addEventListener('mouseover', mouseoverLocalListener);
+                if (position === -1) {
+                    card_list.appendChild(clone_node);
+                    window.kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, count + 1);
+                } else {
+                    let x_task_blocks = x_column.getElementsByClassName('task-block');
+                    card_list.insertBefore(clone_node, x_task_blocks[position]);
+                    window.kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, position);
+                }
 
 
-            document.getElementById(window.touched_element.id).getElementsByClassName('white-card')[0].classList.remove('invisible-card'); //это из-за веселого бага)))
-            document.getElementById(window.touched_element.id).setAttribute('onmouseover', "mouseoverLocalListener(event)");
-            document.getElementById(window.touched_element.id).addEventListener('mouseover', mouseoverLocalListener);
-            window.touch_card.classList.remove('invisible-card');
+            } else {
 
 
+                document.getElementById(window.touched_element.id).getElementsByClassName('white-card')[0].classList.remove('invisible-card'); //это из-за веселого бага)))
+                document.getElementById(window.touched_element.id).setAttribute('onmouseover', "mouseoverLocalListener(event)");
+                document.getElementById(window.touched_element.id).addEventListener('mouseover', mouseoverLocalListener);
+                window.touch_card.classList.remove('invisible-card');
 
+
+            }
         }
         removeHighlight();
         let absoluteCard = window.absoluteCard;
         window.absoluteCard = null;
+        document.getElementsByClassName('absolute-trash')[0].classList.remove('transform-trash');
         setTimeout(function () {
 
 

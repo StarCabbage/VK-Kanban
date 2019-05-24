@@ -8,11 +8,11 @@ body {
     overflow: hidden;
 
 
-
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
 ::-webkit-scrollbar {
     visibility: hidden;
     width: 0;
@@ -27,12 +27,14 @@ body {
 
 textarea {
     resize: none;
+    max-height: 64px;
 }
+
 input:focus, textarea {
     outline: none !important;
 }
 
-.column-main-font{
+.column-main-font {
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
     font-style: normal;
     font-weight: normal;
@@ -42,12 +44,12 @@ input:focus, textarea {
     color: #000000;
 }
 
-.column-header{
+.column-header {
     font-weight: bold;
     padding-bottom: 5px;
 }
 
-.column-grey-footer{
+.column-grey-footer {
     color: #6B808C;
 }
 
@@ -136,6 +138,7 @@ input:focus, textarea {
     -ms-user-select: none;
     user-select: none;
     opacity: 1;
+    overflow: hidden;
 
 
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
@@ -200,20 +203,22 @@ input:focus, textarea {
     word-break: break-word;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.absolute-trash{
+    border-radius: 50px;
+    position: absolute;
+    z-index: 4;
+    left: calc(100vw / 2);
+    bottom: -70px;
+    transition: transform 300ms;
+    background: #DFE3E6;
+}
+.absolute-trash-icon{
+    font-size: 30px;
+    padding: 10px;
+}
+.transform-trash{
+    transform: translateY(-100px);
+}
 
 
 .white-card {
@@ -231,16 +236,10 @@ input:focus, textarea {
 }
 
 
-
 .dragging {
     opacity: 1 !important;
     border: 1px solid blue;
 }
-
-
-
-
-
 
 
 .card--content {
