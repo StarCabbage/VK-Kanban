@@ -80,7 +80,8 @@ function mousemoveWindowListener(event) {
 }
 
 function mousedownLocalListener(event) {
-    if (event.button === 0 && event.ctrlKey) {
+    event.preventDefault();
+    if (event.button === 0 && (event.metaKey || event.ctrlKey)) {
         window.time_out = false;
         if (window.timer_time_out) {
             clearTimeout(window.timer_time_out);
@@ -135,6 +136,8 @@ function mousedownLocalListener(event) {
 
         if (!event.target.classList.contains('selectable-card')) {
             event.target.classList.add('selectable-card');
+        }else {
+            event.target.classList.remove('selectable-card');
         }
         selectText(event.target);
 

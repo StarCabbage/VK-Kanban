@@ -136,6 +136,15 @@ input:focus, textarea {
     -ms-user-select: none;
     user-select: none;
     opacity: 1;
+
+
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 19px;
+
+    color: #000000;
 }
 
 .absolute-invisible-card {
