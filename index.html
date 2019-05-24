@@ -351,7 +351,7 @@
      padding-bottom: 5px;">
             ${title}
         </div>
-        <div class="cards_list card-list-normal" >
+        <div onmouseover="mouseover_listener(event)" class="cards_list card-list-normal" >
 
 
         </div>
@@ -578,10 +578,13 @@
                 }
 
             }
+            removeHighlight();
+            let absolute = window.absolute;
+            window.absolute = null;
             setTimeout(function () {
-                removeHighlight();
+
                 //removeElement(pipa);
-                removeElement(window.absolute);
+                removeElement(absolute);
                 ///window.touched_element.id
                 window.last_mouse_over_element = null;
                 window.touch_card = null;
