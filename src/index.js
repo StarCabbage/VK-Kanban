@@ -22,30 +22,12 @@ function mouseover_listener(ev) {
                 window.highlight = true;
                 window.last_mouse_over_element = ev.target.closest('.task-block');
             }
-            /**
-             * TODO highlight
-             * **/
 
-            /*console.log('белая карта-' + `${window.last_event.target.offsetTop}-${window.last_event.target.offsetTop + window.last_event.target.offsetHeight}
-        -${window.last_event.target.offsetLeft}-${window.last_event.target.offsetLeft + window.last_event.target.offsetWidth}-${window.last_event.target.offsetHeight}
-        -${initialY}-${initialX}
-        `);
 
-            if (window.last_el !== ev.target) {
-                window.changed = true;
-                console.log('chan');
-                window.last_el = ev.target;
-            }
-               */
         } else if (ev.target.closest('.card')) {
             console.log('gan');
             console.log(window.last_mouse_over_element);
-            /*console.log('нет, не белая карта, в таком случае ищем блок');
-            console.log(`${card.offsetTop}-${card.offsetTop + card.offsetHeight}
-            -${card.offsetLeft}-${card.offsetLeft + card.offsetWidth}
-        -${initialY}-${initialX}
-        `);
-            console.log(window.last_event.target.closest('.card'));*/
+
             let card = ev.target.closest('.card');
             if (window.last_mouse_over_element !== card) {
                 removeHighlight();
@@ -121,15 +103,12 @@ function removeHighlight() {
 }
 
 function addHighlight() {
-    let offsetTop = window.last_mouse_over_element.offsetTop,
-        offsetHeight = window.last_mouse_over_element.offsetHeight;
     window.last_highlight = {};
     if (window.last_mouse_over_element.classList.contains('card')) {
 
-        console.log('kokokoko');
 
         let cards_list = window.last_mouse_over_element.getElementsByClassName('cards_list')[0];
-        cards_list.innerHTML += window.strings.removable_highlight;
+        cards_list.innerHTML += window.strings.removable_highlight.t();
         cards_list.getElementsByClassName('removable')[0].style.height = `${window.absolute.offsetHeight - 20}px`;
         window.last_highlight.element = cards_list.getElementsByClassName('removable')[0];
 
@@ -226,15 +205,9 @@ function dragStart(e) {
         window.event = null;
         xOff = e.offsetX;
         yOff = e.offsetY;
-        //console.log(`${initialX}-${xOff}-${initialX - xOff}`);
 
-        //clone_node.style.transform ="rotate(7deg)";
-        //clone_node.style.width = ev.
         document.body.appendChild(clone_node);
-        //clone_node.removeEventListener('mousedown', dragStart);
-        //clone_node.addEventListener('mouseover', mouseover_listener);
-        //clone_node.removeEventListener('mouseover', mouseover_listener);
-        //clone_node.removeEventListener('mouseover', mouseover_listener, true);
+
         clone_node.style.left = `${initialX - xOff}px`;
         clone_node.style.top = `${initialY - yOff}px`;
         window.absolute = clone_node;
@@ -267,7 +240,7 @@ function setTranslate(xPos, yPos, el) {
 //drag
 
 function setBackground(image, xCenter, yCenter) {
-    document.body.style.background = `url('${image}') ${xCenter} ${yCenter} no-repeat fixed`; //требуется спец коофиценты для настройки для разных форматов экрана
+    document.body.style.background = `url('${image}') ${xCenter} ${yCenter} no-repeat fixed`;
 }
 
 function removeElement(elementId) {
@@ -288,12 +261,7 @@ function closeColumn(ev) {
 function closeTaskInput(ev) {
     let card_container = ev.closest('.card-container');
     removeElement(ev.closest('.input_block'));
-    card_container.innerHTML += `<div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
-    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
-            add
-        </i>
-            <div >Добавить ещё одну карточку</div>
-        </div>`;
+    card_container.innerHTML += window.strings.card_container_body_delete.t();
 }
 
 function saveTaskName(ev) {
@@ -320,22 +288,9 @@ function saveTaskName(ev) {
             let cards_list = card_container.getElementsByClassName('cards_list')[0];
             cards_list.classList.add('card-list-normal');
             cards_list.classList.remove('card-list-with-input');
-            cards_list.innerHTML += `<div id="card_${id}"  onmouseover="mouseover_listener(event)"  class="task-block">
-        <div class="place-to-insert">
+            cards_list.innerHTML += window.strings.card_body.t(id, title);
 
-        </div>
-        <div  onmousedown="dragStart(event)"  class=" white-card">
-            ${title}
-        </div>
-
-    </div>`;
-
-            card_container.innerHTML += `<div class="grey-text-color" onmouseover="mouseover_listener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
-    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
-            add
-        </i>
-            <div>Добавить ещё одну карточку</div>
-        </div>`;
+            card_container.innerHTML += window.strings.one_more_card_part.t();
         } else {
             alert('Заполните поле');
         }
@@ -349,29 +304,7 @@ function openTaskInput(ev) {
     let cards_list = card_container.getElementsByClassName('cards_list')[0];
     cards_list.classList.add('card-list-with-input');
     cards_list.classList.remove('card-list-normal');
-    card_container.innerHTML += `<div class="input_block">
-                <div class="white-card" style="color: grey;
-
-    font-weight: 300;">
-  <textarea type="text" class="textarea" id="inp" onkeyup="saveTaskName(event)" placeholder="Введите название карточки" style="
-
-
-"></textarea>
-                </div>
-
-
-
-
-
-            <div class="grey-text-color" style="display: flex;  font-weight: 400; justify-content: space-between;
-    align-items: center;">
-
-                <div class="green-flat-button save_column_name" onclick="saveTaskName(event)">Добавить карточку</div>
-                <i class="material-icons close_column" onclick="closeTaskInput(this);" style="padding-right: 5px;">
-                    close
-                </i>
-
-            </div></div>`;
+    card_container.innerHTML += window.strings.card_container_body_input_state.t();
 }
 
 function isStringEmpty(str) {
@@ -393,21 +326,7 @@ function saveColumnName(ev) {
         }
         if (title !== "") {
             ev.target.closest('.card').id = kanbanManager.saveColumn(title);
-            card.getElementsByClassName('card-container')[0].innerHTML = `<div class="selectable" style="    font-weight: 800;
-     padding-bottom: 5px;">
-            ${title}
-        </div>
-        <div onmouseover="mouseover_listener(event)" class="cards_list card-list-normal" >
-
-
-        </div>
-
-        <div class="grey-text-color" onmouseover="mouseover_listener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
-    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
-            add
-        </i>
-            <div>Добавить ещё одну карточку</div>
-        </div>`;
+            card.getElementsByClassName('card-container')[0].innerHTML = window.strings.column_name.t(title);
         } else {
             alert("Заполните поле")
         }
@@ -436,7 +355,7 @@ class KanbanManager {
 
     writeLocal() {
         console.log('writelocal*******');
-        window.localStorage.setItem('data',JSON.stringify({
+        window.localStorage.setItem('data', JSON.stringify({
             columns: this.columns,
             columnArray: this.columnArray,
             cardsArray: this.cardsArray,
@@ -456,13 +375,9 @@ class KanbanManager {
     }
 
     moveColumnCard(id, oldColumnId, newColumnId, newPosition) {
-        console.log(`id${id}-oldColumnId${oldColumnId}-newColumnId${newColumnId}-newPos${newPosition}`);
-        console.log(this.columnsData);
-
         this.removeColumnCard(id, oldColumnId);
         this.appendColumnCard(id, newColumnId, newPosition);
 
-        console.log(this.columnsData);
         this.writeLocal();
     }
 
@@ -490,47 +405,16 @@ class KanbanManager {
     }
 
     addColumn() {
-        let columnButtonElement = `<div class="card button column">
-                                        <div class="card-container selectable nice-font">
-                                            <div class="grey-text-color" style="display: flex;  font-weight: 400;
-    align-items: center;"><i class="material-icons" style="padding-right: 5px;">
-                                                                                        add
-                                                                                     </i>
-                                                  <div>Добавить ещё одну колонку</div>
-                                            </div>
-                                            </div>
-                                        </div>`;
+        let columnButtonElement = window.strings.column_element.t();
         document.getElementById('columnBox').innerHTML += columnButtonElement;
-        let column_element = document.getElementsByClassName(`column`);
+        let column_element = document.getElementsByClassName("column");
         column_element = column_element[column_element.length - 1];
         /**TODO исправить не очень хорошее решение... **/
         column_element.addEventListener('click', () => {
             //console.log(ev);
             removeElement(column_element.getElementsByClassName('grey-text-color')[0]);
             let cardContainer = column_element.getElementsByClassName('card-container')[0];
-            cardContainer.innerHTML += `
-                <div class="white-card" style="color: grey;
-
-    font-weight: 300;">
-  <textarea type="text" class="textarea" id="inp" placeholder="Введите название колонки" onkeyup="saveColumnName(event)" style="
-
-
-"></textarea>
-                </div>
-
-
-
-
-
-            <div class="grey-text-color" style="display: flex;  font-weight: 400; justify-content: space-between;
-    align-items: center;">
-
-                <div class="green-flat-button save_column_name" onclick="saveColumnName(event)">Добавить колонку</div>
-                <i class="material-icons close_column" onclick="closeColumn(this);" style="padding-right: 5px;">
-                    close
-                </i>
-
-            </div>`;
+            cardContainer.innerHTML += window.strings.card_container_body.t();
             this.addColumn();
         }, {once: true});
 
