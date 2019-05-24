@@ -31,30 +31,47 @@ body {
 
 
 }
-.hide{
+
+.hide {
     margin: 0 !important;
     padding: 0 !important;
     height: 0 !important;
     overflow: hidden;
     pointer-events: none;
 }
-.absolute{
+
+.absolute {
     position: absolute !important;
     z-index: 5;
     pointer-events: none;
     max-height: 80px;
+
+    opacity: 1;
 }
+
+.absolute-hide {
+    opacity: 0 !important;
+}
+
 .space_element::before,
-.space_element::after{
+.space_element::after {
     content: " ";
     width: 10px;
     height: 1px;
 }
-.card-list-normal{
-    width: 100%;  max-height: calc(100vh - 120px); overflow-y: auto; min-height: 12px;
+
+.card-list-normal {
+    width: 100%;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    min-height: 12px;
 }
-.card-list-with-input{
-    width: 100%;  max-height: calc(100vh - 184px); overflow-y: auto; min-height: 12px;
+
+.card-list-with-input {
+    width: 100%;
+    max-height: calc(100vh - 184px);
+    overflow-y: auto;
+    min-height: 12px;
 }
 
 input:focus, textarea {
@@ -107,6 +124,7 @@ textarea {
     width: 100%;
     word-break: break-word;
 }
+
 [draggable] {
     -moz-user-select: none;
     -khtml-user-select: none;
@@ -114,7 +132,7 @@ textarea {
     user-select: none;
 }
 
-.norm-card{
+.norm-card {
     background: #C9D2D9;
     padding: 10px 0;
     height: 0;
@@ -137,21 +155,22 @@ textarea {
     word-break: break-word;
     font-weight: 400;
     padding: 10px;
-    transition: height 200ms, padding 200ms, margin 200ms;
+    transition: height 200ms, padding 200ms, margin 200ms, opacity 200ms;
     margin: 8px 2px;
 
 }
 
-.highlite-card::before{
+.highlite-card::before {
     content: " ";
     width: 1px;
     height: 10px;
 }
 
-.dragging{
+.dragging {
     opacity: 1 !important;
     border: 1px solid blue;
 }
+
 .card {
     flex: 0 0 auto;
     width: 272px;

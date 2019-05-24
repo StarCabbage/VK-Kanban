@@ -526,9 +526,10 @@
 
 
         if (window.absolute) {
-            window.absolute.classList.add('hide');
+            window.absolute.classList.add('absolute-hide');
             console.log('up');
             console.log(window.touched_element);
+            document.body.style.pointerEvents = "none";
             let highlight_cards = document.getElementsByClassName('norm-card');
             console.log(highlight_cards);
             if (highlight_cards.length === 0) {
@@ -590,7 +591,7 @@
                 window.touch_card = null;
                 window.touched_element = null;
                 window.absolute = null;
-
+                document.body.style.pointerEvents = "all";
             }, 200);
 
 
