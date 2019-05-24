@@ -1,3 +1,4 @@
+/** Useful class for strings manage and strings array*/
 class Word {
     constructor(text) {
         this.text = text;
@@ -17,22 +18,25 @@ class Word {
 
 
 window.strings = {
+    /**Usual strings */
+    backgroundPath: new Word('background.png'),
+    addCard: new Word('Добавить ещё одну карточку'),
 
-    removable_highlight: new Word(`<div style=" margin-bottom: 8px;" class="removable norm-card"></div>`),
-    column_name: new Word(`<div class="selectable" style="    font-weight: 800;
-     padding-bottom: 5px;">
+    /**HTML strings */
+    removable_highlight: new Word(`<div style=" margin-bottom: 8px;" class="removable highlight-card"></div>`),
+    column_name: new Word(`<div class="selectable-area column-header"  style="    font-weight: 800;">
             %
-        </div><div onmouseover="mouseover_listener(event)" class="cards_list card-list-normal" >
+        </div><div onmouseover="mouseoverLocalListener(event)" class="cards_list" >
 
 
-        </div><div class="grey-text-color" onmouseover="mouseover_listener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+        </div><div class="grey-text-color" onmouseover="mouseoverLocalListener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
             add
         </i>
             <div>Добавить ещё одну карточку</div>
         </div>`),
-    column_element: new Word(`<div class="card button column">
-                                        <div class="card-container selectable nice-font">
+    column_element: new Word(`<div class="column column-main-font button column">
+                                        <div class="column-container selectable-area">
                                             <div class="grey-text-color" style="display: flex;  font-weight: 400;
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
                                                                                         add
@@ -63,16 +67,16 @@ window.strings = {
         </i>
             <div >Добавить ещё одну карточку</div>
         </div>`),
-    card_body: new Word(`<div id="card_%"  onmouseover="mouseover_listener(event)"  class="task-block">
+    card_body: new Word(`<div id="card_%"  onmouseover="mouseoverLocalListener(event)"  class="task-block">
         <div class="place-to-insert">
 
         </div>
-        <div  onmousedown="dragStart(event)"  class=" white-card">
+        <div  onmousedown="mousedownLocalListener(event)"  class="white-card">
             %
         </div>
 
     </div>`),
-    one_more_card_part: new Word( `<div class="grey-text-color" onmouseover="mouseover_listener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
+    one_more_card_part: new Word( `<div class="grey-text-color" onmouseover="mouseoverLocalListener(event)" onclick="openTaskInput(this)" style="display: flex;  font-weight: 400;
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
             add
         </i>

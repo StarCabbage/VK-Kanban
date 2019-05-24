@@ -13,15 +13,80 @@ body {
     justify-content: center;
     align-items: center;
 }
-
-.nice-font {
-    font-weight: 500;
-    font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
-    font-size: 13px;
-    color: black;
+::-webkit-scrollbar {
+    visibility: hidden;
+    width: 0;
 }
 
-.scrolling-wrapper-flexbox {
+[draggable] {
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+textarea {
+    resize: none;
+}
+input:focus, textarea {
+    outline: none !important;
+}
+
+.column-main-font{
+    font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 19px;
+
+    color: #000000;
+}
+
+.column-header{
+    font-weight: bold;
+    padding-bottom: 5px;
+}
+
+.column-grey-footer{
+    color: #6B808C;
+}
+
+.column {
+    flex: 0 0 auto;
+    width: 272px;
+    transition: all 2s;
+    height: fit-content;
+    background: #DFE3E6;
+    border-radius: 3px;
+    margin: 0 10px 0 10px;
+    word-break: break-word;
+
+}
+
+.highlight-card {
+    background: #C9D2D9;
+    padding: 10px 0;
+    height: 0;
+    pointer-events: none;
+    -webkit-box-shadow: 0 0;
+    box-shadow: 0 0;
+    transition: height 100ms, padding 100ms, margin 100ms;
+    margin: 0 2px;
+    color: black;
+    font-weight: 400;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.green-flat-button {
+    padding: 7px;
+    font-weight: bold;
+    color: white;
+    border-radius: 3px;
+    background: #39C071;
+}
+
+.scrolling-wrapper-flex-box {
     display: flex;
     flex-wrap: nowrap;
     min-width: 100%;
@@ -32,42 +97,81 @@ body {
 
 }
 
-.hide {
+.scrolling-wrapper-flex-box::-webkit-scrollbar-track {
+
+    background-color: transparent;
+}
+
+.scrolling-wrapper-flex-box::-webkit-scrollbar {
+    height: 21px;
+    background-color: transparent;
+}
+
+.scrolling-wrapper-flex-box::-webkit-scrollbar-thumb {
+    background-clip: padding-box;
+    background-color: white;
+    border-radius: 12px;
+    border: 7px solid transparent;
+}
+
+.invisible-card {
     margin: 0 !important;
     padding: 0 !important;
     height: 0 !important;
     overflow: hidden;
     pointer-events: none;
-    -webkit-user-select: none; /* Safari 3.1+ */
-    -moz-user-select: none; /* Firefox 2+ */
-    -ms-user-select: none; /* IE 10+ */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
 }
 
-.absolute {
+.absolute-card {
     position: absolute !important;
     z-index: 5;
     pointer-events: none;
     max-height: 80px;
-    -webkit-user-select: none; /* Safari 3.1+ */
-    -moz-user-select: none; /* Firefox 2+ */
-    -ms-user-select: none; /* IE 10+ */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
     opacity: 1;
 }
 
-.absolute-hide {
+.absolute-invisible-card {
     opacity: 0 !important;
 }
 
-.space_element::before,
-.space_element::after {
+.space-elements::before,
+.space-elements::after {
     content: " ";
     width: 10px;
     height: 1px;
 }
 
-.card-list-normal {
+.column-container {
+    margin: 10px;
+}
+
+.button {
+    user-select: none;
+}
+
+.selectable-area {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+}
+
+.selectable-card {
+    -webkit-user-select: all !important;
+    -moz-user-select: all !important;
+    -ms-user-select: all !important;
+    user-select: all !important;
+}
+
+.cards_list {
     width: 100%;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
@@ -75,84 +179,33 @@ body {
 }
 
 .card-list-with-input {
-    width: 100%;
-    max-height: calc(100vh - 184px);
-    overflow-y: auto;
-    min-height: 12px;
-}
-
-input:focus, textarea {
-    outline: none !important;
-}
-
-textarea {
-    resize: none;
-}
-
-::-webkit-scrollbar {
-    visibility: hidden;
-    width: 0;
-}
-
-.scrolling-wrapper-flexbox::-webkit-scrollbar-track {
-
-    background-color: transparent;
-}
-
-.scrolling-wrapper-flexbox::-webkit-scrollbar {
-    height: 21px;
-    background-color: transparent;
-}
-
-.scrolling-wrapper-flexbox::-webkit-scrollbar-thumb {
-    background-clip: padding-box;
-    background-color: white;
-    border-radius: 12px;
-    border: 7px solid transparent;
-}
-
-.button {
-    user-select: none;
-}
-
-.green-flat-button {
-    padding: 7px;
-    color: white;
-    border-radius: 3px;
-    background: #39C071;
+    max-height: calc(100vh - 184px) !important;
 }
 
 .textarea {
     padding: unset;
     border: none;
-
     -webkit-highlight: unset;
     background: none;
     width: 100%;
     word-break: break-word;
 }
 
-[draggable] {
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
-}
 
-.norm-card {
-    background: #C9D2D9;
-    padding: 10px 0;
-    height: 0;
-    pointer-events: none;
-    -webkit-box-shadow: 0 0px;
-    box-shadow: 0 0px;
-    transition: height 100ms, padding 100ms, margin 100ms;
-    margin: 0 2px;
-    color: black;
-    font-weight: 400;
-    border-radius: 3px;
-    overflow: hidden;
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 .white-card {
     background: white;
@@ -168,42 +221,18 @@ textarea {
 
 }
 
-.highlite-card::before {
-    content: " ";
-    width: 1px;
-    height: 10px;
-}
+
 
 .dragging {
     opacity: 1 !important;
     border: 1px solid blue;
 }
 
-.card {
-    flex: 0 0 auto;
-    width: 272px;
-    transition: all 2s;
-    height: fit-content;
-    background-color: #EDEEF0;
-    border-radius: 3px;
-    margin: 0 10px 0 10px;
-    word-break: break-word;
 
-}
 
-.selectable {
-    -webkit-user-select: text !important;
-    -moz-user-select: text !important;
-    -ms-user-select: text !important;
-    user-select: text !important;
-}
 
-.selectable-all {
-    -webkit-user-select: all !important;
-    -moz-user-select: all !important;
-    -ms-user-select: all !important;
-    user-select: all !important;
-}
+
+
 
 .card--content {
     width: 300px;
@@ -225,11 +254,3 @@ textarea {
     min-width: 10px;
 }
 
-.card::-webkit-scrollbar {
-
-
-}
-
-.card-container {
-    margin: 10px;
-}

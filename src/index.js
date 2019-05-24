@@ -1,55 +1,44 @@
-//drag
-
-
-window.absolute = null;
+/**Global Values */
+window.absoluteCard = null;
 window.highlight = false;
 window.last_mouse_over_element = null;
+window.timer_time_out = null;
 
-function mouseover_listener(ev) {
-    //window.above = ev;
-    console.log('mousemove');
-    console.log(absolute);
-    if (window.absolute) {
-        window.last_event = ev;
-        //console.log(ev.target);
-        //console.log('+++++++++++');
-        //console.log(window.last_el);
-        if (ev.target.closest('.task-block')) {
-            console.log('gon');
-            console.log(window.last_mouse_over_element);
-            if (window.last_mouse_over_element !== ev.target.closest('.task-block')) {
-                removeHighlight();
+
+
+
+
+
+/**Listeners */
+function mouseoverLocalListener(event) {
+
+    if (window.absoluteCard) {
+        window.last_event = event;
+        if (event.target.closest('.task-block')) {
+            if (window.last_mouse_over_element !== event.target.closest('.task-block')) {
+                removeHighlight(); //Удаление подсветки места для вставки карточки
                 window.highlight = true;
-                window.last_mouse_over_element = ev.target.closest('.task-block');
+                window.last_mouse_over_element = event.target.closest('.task-block');
             }
-
-
-        } else if (ev.target.closest('.card')) {
-            console.log('gan');
-            console.log(window.last_mouse_over_element);
-
-            let card = ev.target.closest('.card');
-            if (window.last_mouse_over_element !== card) {
-                removeHighlight();
-
+        } else if (event.target.closest('.column')) {
+            let column = event.target.closest('.column');
+            if (window.last_mouse_over_element !== column) {
+                removeHighlight(); //Удаление подсветки места для вставки карточки
                 window.highlight = true;
-                window.last_mouse_over_element = card;
+                window.last_mouse_over_element = column;
             }
         }
     }
 }
 
-
-function mousemove_listener(event) {
-    if (window.absolute) {
+function mousemoveWindowListener(event) {
+    if (window.absoluteCard) {
         let eventDoc, doc, body;
 
 
-        event = event || window.event; // IE-ism
+        event = event || window.event;
 
-        // If pageX/Y aren't available and clientX/Y are,
-        // calculate pageX/Y - logic taken from jQuery.
-        // (This is to support old IE)
+
         if (event.pageX == null && event.clientX != null) {
             eventDoc = (event.target && event.target.ownerDocument) || document;
             doc = eventDoc.documentElement;
@@ -67,8 +56,8 @@ function mousemove_listener(event) {
         initialY = event.pageY;
 
 
-        window.absolute.style.top = `${event.pageY - yOff}px`;
-        window.absolute.style.left = `${event.pageX - xOff}px`;
+        window.absoluteCard.style.top = `${event.pageY - yOff}px`;
+        window.absoluteCard.style.left = `${event.pageX - xOff}px`;
 
 
         if (window.last_highlight) {
@@ -90,13 +79,161 @@ function mousemove_listener(event) {
     }
 }
 
+function mousedownLocalListener(event) {
+    if (event.button === 0 && event.ctrlKey) {
+        window.time_out = false;
+        if (window.timer_time_out) {
+            clearTimeout(window.timer_time_out);
+        }
+        window.timer_time_out = setTimeout(function () {
+            window.time_out = true;
+        }, 400);
+        if (event.target.classList.contains('selectable-card')) {
+            event.target.classList.remove('selectable-card');
+        }
+
+        if (event.type === "touchstart") {
+            initialX = event.touches[0].clientX - xOffset;
+            initialY = event.touches[0].clientY - yOffset;
+        } else {
+            initialX = event.clientX - xOffset;
+            initialY = event.clientY - yOffset;
+        }
+
+        window.touched_element = event.target.closest('.task-block');
+
+        window.touch_card = event.target;
+
+
+        event.target.closest('.task-block').removeAttribute('onmouseover');
+        event.target.closest('.task-block').removeEventListener('mouseover', mouseoverLocalListener);
+
+        let clone_node = event.target.cloneNode(true);
+        clone_node.classList.add('absolute-card');
+
+        clone_node.removeAttribute('onmouseover');
+        clone_node.removeAttribute('onmousedown');
+        clone_node.style.height = `${clone_node.offsetHeight - 20}px`;
+        clone_node.style.width = `${event.target.offsetWidth - 20}px`;
+        clone_node.classList.add('nice-font');
+        window.event = null;
+        xOff = event.offsetX;
+        yOff = event.offsetY;
+
+        document.body.appendChild(clone_node);
+
+        clone_node.style.left = `${initialX - xOff}px`;
+        clone_node.style.top = `${initialY - yOff}px`;
+        window.absoluteCard = clone_node;
+
+
+        event.target.classList.add('invisible-card');
+
+        active = true;
+
+    } else {
+
+        if (!event.target.classList.contains('selectable-card')) {
+            event.target.classList.add('selectable-card');
+        }
+        selectText(event.target);
+
+    }
+
+}
+
+function mouseupWindowListener(event) {
+
+
+
+    if (window.absoluteCard) {
+        window.absoluteCard.classList.add('absolute-invisible-card');
+
+        document.body.style.pointerEvents = "none";
+        let highlight_cards = document.getElementsByClassName('highlight-card');
+
+        if (highlight_cards.length !== 0 && window.time_out) {
+
+            let touched_element = document.getElementById(window.touched_element.id);
+            let clone_node = touched_element.cloneNode(true);
+            let oldColumnId = touched_element.closest('.column').id;
+            removeElement(touched_element);
+            let x_column = highlight_cards[0].closest('.column');
+            let list_possible_highlights = x_column.getElementsByClassName('place-to-insert');
+            let count = 0;
+            let position = -1;
+            for (let element of list_possible_highlights) {
+                if (element !== highlight_cards[0]) {
+                    count += 1;
+                } else {
+                    position = count;
+                    break;
+                }
+            }
+            let card_list = x_column.getElementsByClassName('cards_list')[0];
+            clone_node.getElementsByClassName('white-card')[0].classList.remove('invisible-card');
+            clone_node.setAttribute('onmouseover', "mouseoverLocalListener(event)");
+            clone_node.addEventListener('mouseover', mouseoverLocalListener);
+            if (position === -1) {
+
+
+                card_list.appendChild(clone_node);
+                kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, count + 1);
+            } else {
+                let x_task_blocks = x_column.getElementsByClassName('task-block');
+                card_list.insertBefore(clone_node, x_task_blocks[position]);
+                kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, position);
+            }
+
+
+        } else {
+
+
+            document.getElementById(window.touched_element.id).getElementsByClassName('white-card')[0].classList.remove('invisible-card'); //это из-за веселого бага)))
+            document.getElementById(window.touched_element.id).setAttribute('onmouseover', "mouseoverLocalListener(event)");
+            document.getElementById(window.touched_element.id).addEventListener('mouseover', mouseoverLocalListener);
+            window.touch_card.classList.remove('invisible-card');
+
+
+
+        }
+        removeHighlight();
+        let absoluteCard = window.absoluteCard;
+        window.absoluteCard = null;
+        setTimeout(function () {
+
+
+            removeElement(absoluteCard);
+
+            window.last_mouse_over_element = null;
+            window.touch_card = null;
+            window.touched_element = null;
+            window.absoluteCard = null;
+            document.body.style.pointerEvents = "auto";
+        }, 200);
+
+
+    }
+}
+
+/**App initiation */
+window.onload = function () {
+    initPage();
+
+};
+
+
+/**Usual functions */
+
+
+
 function removeHighlight() {
     if (window.last_highlight) {
         if (window.last_highlight.element.classList.contains('removable')) {
             removeElement(window.last_highlight.element);
         } else {
             window.last_highlight.element.style.height = '0';
-            window.last_highlight.element.classList.remove('norm-card');
+            window.last_highlight.element.classList.remove('highlight-card');
         }
     }
     window.last_highlight = null;
@@ -104,23 +241,22 @@ function removeHighlight() {
 
 function addHighlight() {
     window.last_highlight = {};
-    if (window.last_mouse_over_element.classList.contains('card')) {
+    if (window.last_mouse_over_element.classList.contains('column')) {
 
 
         let cards_list = window.last_mouse_over_element.getElementsByClassName('cards_list')[0];
         cards_list.innerHTML += window.strings.removable_highlight.t();
-        cards_list.getElementsByClassName('removable')[0].style.height = `${window.absolute.offsetHeight - 20}px`;
+        cards_list.getElementsByClassName('removable')[0].style.height = `${window.absoluteCard.offsetHeight - 20}px`;
         window.last_highlight.element = cards_list.getElementsByClassName('removable')[0];
 
 
     } else {
-        console.log('goes_here');
+
         let place_to_insert = window.last_mouse_over_element.getElementsByClassName('place-to-insert')[0];
-        place_to_insert.classList.add('norm-card');
-        place_to_insert.style.height = `${window.absolute.offsetHeight - 20}px`;
+        place_to_insert.classList.add('highlight-card');
+        place_to_insert.style.height = `${window.absoluteCard.offsetHeight - 20}px`;
         window.last_highlight.element = place_to_insert;
-        //offsetTop = window.last_mouse_over_element.offsetTop;
-        //offsetHeight = window.last_mouse_over_element.offsetHeight;
+
     }
 
 
@@ -130,18 +266,6 @@ function addHighlight() {
     window.last_highlight.offsetWidth = window.last_mouse_over_element.offsetWidth;
 
 }
-
-
-let active = false;
-let currentX;
-let currentY;
-let initialX;
-let initialY;
-let xOffset = 0;
-let yOffset = 0;
-let xOff = 0;
-let yOff = 0;
-let time_out = false;
 
 function selectText(node) {
 
@@ -161,90 +285,12 @@ function selectText(node) {
     }
 }
 
-window.timer_time_out = null;
-
-function dragStart(e) {
-    if (e.button === 0 && e.ctrlKey) {
-        window.time_out = false;
-        if (window.timer_time_out) {
-            clearTimeout(window.timer_time_out);
-        }
-        window.timer_time_out = setTimeout(function () {
-            window.time_out = true;
-        }, 400);
-        if (e.target.classList.contains('selectable-all')) {
-            e.target.classList.remove('selectable-all');
-        }
-        console.log('opa');
-        console.log(e);
-        console.log('opa');
-        if (e.type === "touchstart") {
-            initialX = e.touches[0].clientX - xOffset;
-            initialY = e.touches[0].clientY - yOffset;
-        } else {
-            initialX = e.clientX - xOffset;
-            initialY = e.clientY - yOffset;
-        }
-
-        window.touched_element = e.target.closest('.task-block');
-        console.log(window.touched_element);
-        window.touch_card = e.target;
-        //window.absolute = e.target;
-
-        e.target.closest('.task-block').removeAttribute('onmouseover');
-        e.target.closest('.task-block').removeEventListener('mouseover', mouseover_listener);
-
-        let clone_node = e.target.cloneNode(true);
-        clone_node.classList.add('absolute');
-
-        clone_node.removeAttribute('onmouseover');
-        clone_node.removeAttribute('onmousedown');
-        clone_node.style.height = `${clone_node.offsetHeight - 20}px`;
-        clone_node.style.width = `${e.target.offsetWidth - 20}px`;
-        clone_node.classList.add('nice-font');
-        window.event = null;
-        xOff = e.offsetX;
-        yOff = e.offsetY;
-
-        document.body.appendChild(clone_node);
-
-        clone_node.style.left = `${initialX - xOff}px`;
-        clone_node.style.top = `${initialY - yOff}px`;
-        window.absolute = clone_node;
-
-        //clone_node.classList.add('absolute');
-        //document.appendChild(clone_node);
-        e.target.classList.add('hide');
-
-        active = true;
-
-    } else {
-
-        if (!e.target.classList.contains('selectable-all')) {
-            e.target.classList.add('selectable-all');
-        } else {
-            //e.target.classList.remove('selectable-all');
-        }
-        selectText(e.target);
-
-    }
-
-}
-
-
-function setTranslate(xPos, yPos, el) {
-    el.style.transform = "translate3d(" + xPos - xOff + "px, " + yPos - yOff + "px, 0)";
-}
-
-
-//drag
-
 function setBackground(image, xCenter, yCenter) {
     document.body.style.background = `url('${image}') ${xCenter} ${yCenter} no-repeat fixed`;
 }
 
 function removeElement(elementId) {
-    // Removes an element from the document
+
     let element = elementId;
     if (typeof elementId !== typeof (null)) {
         element = document.getElementById(elementId);
@@ -254,39 +300,38 @@ function removeElement(elementId) {
 
 function closeColumn(ev) {
 
-    removeElement(ev.closest('.card'));
+    removeElement(ev.closest('.column'));
 
 }
 
 function closeTaskInput(ev) {
-    let card_container = ev.closest('.card-container');
+    let card_container = ev.closest('.column-container');
     removeElement(ev.closest('.input_block'));
     card_container.innerHTML += window.strings.card_container_body_delete.t();
 }
 
 function saveTaskName(ev) {
-    console.log(ev);
+
     if (!ev.shiftKey && ev.keyCode === 13 || !ev.type.localeCompare('click')) {
 
 
-        let card = ev.target.closest('.card');
-        let input = card.getElementsByClassName('textarea')[0];
+        let column = ev.target.closest('.column');
+        let input = column.getElementsByClassName('textarea')[0];
         let title = input.value;
 
         title.replace(/^\s*\n/gm, "");
         if (isStringEmpty(title)) {
             title = "";
-            console.log('go');
+
             input.value = "";
         }
-        console.log(title);
+
         if (title !== "") {
-            let id = kanbanManager.saveColumnCard(title, card.id);
-            let card_container = ev.target.closest('.card-container');
+            let id = kanbanManager.saveColumnCard(title, column.id);
+            let card_container = ev.target.closest('.column-container');
             let input_block = card_container.getElementsByClassName('input_block')[0];
             removeElement(input_block);
             let cards_list = card_container.getElementsByClassName('cards_list')[0];
-            cards_list.classList.add('card-list-normal');
             cards_list.classList.remove('card-list-with-input');
             cards_list.innerHTML += window.strings.card_body.t(id, title);
 
@@ -297,13 +342,11 @@ function saveTaskName(ev) {
     }
 }
 
-
 function openTaskInput(ev) {
-    let card_container = ev.closest('.card-container');
+    let card_container = ev.closest('.column-container');
     removeElement(ev);
     let cards_list = card_container.getElementsByClassName('cards_list')[0];
     cards_list.classList.add('card-list-with-input');
-    cards_list.classList.remove('card-list-normal');
     card_container.innerHTML += window.strings.card_container_body_input_state.t();
 }
 
@@ -313,132 +356,24 @@ function isStringEmpty(str) {
 
 function saveColumnName(ev) {
     if (!ev.shiftKey && ev.keyCode === 13 || !ev.type.localeCompare('click')) {
-        let card = ev.target.closest('.card');
+        let column = ev.target.closest('.column');
 
-        let input = card.getElementsByClassName('textarea')[0];
+        let input = column.getElementsByClassName('textarea')[0];
         let title = input.value;
-        console.log(title);
+
         title.replace(/^\s*\n/gm, "");
         if (isStringEmpty(title)) {
             title = "";
-            console.log('go');
+
             input.value = "";
         }
         if (title !== "") {
-            ev.target.closest('.card').id = kanbanManager.saveColumn(title);
-            card.getElementsByClassName('card-container')[0].innerHTML = window.strings.column_name.t(title);
+            ev.target.closest('.column').id = kanbanManager.saveColumn(title);
+            column.getElementsByClassName('column-container')[0].innerHTML = window.strings.column_name.t(title);
         } else {
             alert("Заполните поле")
         }
     }
-}
-
-function addElement(parentId, elementTag, elementId, html) {
-    // Adds an element to the document
-    var p = document.getElementById(parentId);
-    var newElement = document.createElement(elementTag);
-    newElement.setAttribute('id', elementId);
-    newElement.innerHTML = html;
-    p.appendChild(newElement);
-}
-
-class KanbanManager {
-    constructor(kanbanTasks = []) {
-        if (kanbanTasks.length === 0) {
-            this.columns = 0;
-            this.addColumn();
-            this.columnArray = [];
-            this.cardsArray = [];
-            this.columnsData = {};
-        }
-    }
-
-    writeLocal() {
-        console.log('writelocal*******');
-        window.localStorage.setItem('data', JSON.stringify({
-            columns: this.columns,
-            columnArray: this.columnArray,
-            cardsArray: this.cardsArray,
-            columnsData: this.columnsData
-        }))
-    }
-
-    saveColumnCard(name, columnId) {
-        this.cardsArray.push(name);
-        let cardId = this.cardsArray.length - 1;
-        let num = parseInt(columnId.split('_')[1]);
-
-        if (!this.columnsData[num]) this.columnsData[num] = [];
-        this.columnsData[num].push(cardId);
-        this.writeLocal();
-        return cardId;
-    }
-
-    moveColumnCard(id, oldColumnId, newColumnId, newPosition) {
-        this.removeColumnCard(id, oldColumnId);
-        this.appendColumnCard(id, newColumnId, newPosition);
-
-        this.writeLocal();
-    }
-
-    removeColumnCard(id, columnId) {
-        let num = parseInt(columnId.split('_')[1]);
-        let card_id = parseInt(id.split('_')[1]);
-        let index = this.columnsData[num].indexOf(card_id);
-        if (!this.columnsData[num]) this.columnsData[num] = [];
-        this.columnsData[num].splice(index, 1);
-    }
-
-    appendColumnCard(id, columnId, position) {
-        let num = parseInt(columnId.split('_')[1]);
-        let card_id = parseInt(id.split('_')[1]);
-        let index = position;
-        if (!this.columnsData[num]) this.columnsData[num] = [];
-        this.columnsData[num].splice(index, 0, card_id);
-
-    }
-
-    saveColumn(name) {
-        this.columnArray.push(name);
-        this.writeLocal();
-        return `column_${this.columnArray.length}`;
-    }
-
-    addColumn() {
-        let columnButtonElement = window.strings.column_element.t();
-        document.getElementById('columnBox').innerHTML += columnButtonElement;
-        let column_element = document.getElementsByClassName("column");
-        column_element = column_element[column_element.length - 1];
-        /**TODO исправить не очень хорошее решение... **/
-        column_element.addEventListener('click', () => {
-            //console.log(ev);
-            removeElement(column_element.getElementsByClassName('grey-text-color')[0]);
-            let cardContainer = column_element.getElementsByClassName('card-container')[0];
-            cardContainer.innerHTML += window.strings.card_container_body.t();
-            this.addColumn();
-        }, {once: true});
-
-
-        console.log(this.columns)
-    }
-}
-
-
-let variables = {
-    backgroundPath: 'background.png',
-    addCard: 'Добавить ещё одну карточку'
-
-};
-
-function lock_right_click(e) {
-    e.preventDefault();
-}
-
-function autoExpandTextArea() {
-    document.addEventListener('input', function (event) {
-        if (event.target.tagName.toLowerCase() !== 'textarea') return;
-        autoExpand(event.target);
-    }, false);
 }
 
 function autoExpand(field) {
@@ -458,94 +393,76 @@ function autoExpand(field) {
     field.style.height = height + 'px';
 }
 
+function autoExpandTextArea() {
+    document.addEventListener('input', function (event) {
+        if (event.target.tagName.toLowerCase() !== 'textarea') return;
+        autoExpand(event.target);
+    }, false);
+}
+
+function addElement(parentId, elementTag, elementId, html) {
+
+    var p = document.getElementById(parentId);
+    var newElement = document.createElement(elementTag);
+    newElement.setAttribute('id', elementId);
+    newElement.innerHTML = html;
+    p.appendChild(newElement);
+}
+
+// Эта функция инициирует приложение
 function initPage() {
-    setBackground(variables.backgroundPath, '20%', '60%');
+    //Устанавливаем фон приложения
+    setBackground(window.strings.backgroundPath.t(), '20%', '60%');
+
+    //Инициируем глобальные листнеры
     autoExpandTextArea();
     window.kanbanManager = new KanbanManager();
-    document.onmousemove = mousemove_listener;
-    document.onmouseup = up;
+    document.onmousemove = mousemoveWindowListener;
+    document.onmouseup = mouseupWindowListener;
 
 }
 
-window.onload = function () {
-    initPage();
-
-};
-
-function up(ev) {
-    //console.log(ev);
-
-
-    if (window.absolute) {
-        window.absolute.classList.add('absolute-hide');
-        console.log('up');
-        console.log(window.touched_element);
-        document.body.style.pointerEvents = "none";
-        let highlight_cards = document.getElementsByClassName('norm-card');
-        console.log(highlight_cards);
-        if (highlight_cards.length !== 0 && window.time_out) {
-            //console.log(window.touched_element.id);
-            let touched_element = document.getElementById(window.touched_element.id);
-            let clone_node = touched_element.cloneNode(true);
-            let oldColumnId = touched_element.closest('.card').id;
-            removeElement(touched_element);
-            let x_column = highlight_cards[0].closest('.card');
-            let list_possible_highlights = x_column.getElementsByClassName('place-to-insert');
-            let count = 0;
-            let position = -1;
-            for (let element of list_possible_highlights) {
-                if (element !== highlight_cards[0]) {
-                    count += 1;
-                } else {
-                    position = count;
-                    break;
-                }
-            }
-            let card_list = x_column.getElementsByClassName('cards_list')[0];
-            clone_node.getElementsByClassName('white-card')[0].classList.remove('hide');
-            clone_node.setAttribute('onmouseover', "mouseover_listener(event)");
-            clone_node.addEventListener('mouseover', mouseover_listener);
-            if (position === -1) {
-                console.log('append');
-
-                card_list.appendChild(clone_node);
-                kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, count + 1);
-            } else {
-                let x_task_blocks = x_column.getElementsByClassName('task-block');
-                card_list.insertBefore(clone_node, x_task_blocks[position]);
-                kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, position);
-            }
+let active = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
+let xOff = 0;
+let yOff = 0;
+let time_out = false;
 
 
-        } else {
-
-            //let white_card = window.touched_element.getElementsByClassName('white-card')[0];
-            //console.log(window.touched_element.getElementsByClassName('white-card'));
-            //console.log('white card');
-            //console.log(JSON.stringify(white_card));
-            document.getElementById(window.touched_element.id).getElementsByClassName('white-card')[0].classList.remove('hide'); //это из-за веселого бага)))
-            document.getElementById(window.touched_element.id).setAttribute('onmouseover', "mouseover_listener(event)");
-            document.getElementById(window.touched_element.id).addEventListener('mouseover', mouseover_listener);
-            window.touch_card.classList.remove('hide');
-            window.touch_card.classList.remove('hide');
 
 
-        }
-        removeHighlight();
-        let absolute = window.absolute;
-        window.absolute = null;
-        setTimeout(function () {
-
-            //removeElement(pipa);
-            removeElement(absolute);
-            ///window.touched_element.id
-            window.last_mouse_over_element = null;
-            window.touch_card = null;
-            window.touched_element = null;
-            window.absolute = null;
-            document.body.style.pointerEvents = "auto";
-        }, 200);
 
 
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
