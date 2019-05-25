@@ -4,10 +4,7 @@ body {
     -o-background-size: cover;
     background-size: cover;
     margin: 0 !important;
-
     overflow: hidden;
-
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -30,7 +27,8 @@ textarea {
     max-height: 64px;
 }
 
-input:focus, textarea {
+input:focus,
+textarea {
     outline: none !important;
 }
 
@@ -40,7 +38,6 @@ input:focus, textarea {
     font-weight: normal;
     font-size: 13px;
     line-height: 19px;
-
     color: #000000;
 }
 
@@ -62,11 +59,11 @@ input:focus, textarea {
     user-select: none;
 }
 
-.removable{
+.removable {
     margin-bottom: 8px;
 }
 
-.column-icon{
+.column-icon {
     padding-right: 5px;
 }
 
@@ -79,7 +76,6 @@ input:focus, textarea {
     border-radius: 3px;
     margin: 0 10px 0 10px;
     word-break: break-word;
-
 }
 
 .highlight-card {
@@ -105,7 +101,7 @@ input:focus, textarea {
     background: #39C071;
 }
 
-.green-column-footer{
+.green-column-footer {
     justify-content: space-between;
 }
 
@@ -116,12 +112,9 @@ input:focus, textarea {
     min-height: 100%;
     margin: 20px 0 20px 0;
     overflow-x: auto;
-
-
 }
 
 .scrolling-wrapper-flex-box::-webkit-scrollbar-track {
-
     background-color: transparent;
 }
 
@@ -160,14 +153,11 @@ input:focus, textarea {
     user-select: none;
     opacity: 1;
     overflow: scroll;
-
-
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
     font-style: normal;
     font-weight: normal;
     font-size: 13px;
     line-height: 19px;
-
     color: #000000;
 }
 
@@ -228,7 +218,7 @@ input:focus, textarea {
     word-break: break-word;
 }
 
-.absolute-trash{
+.absolute-trash {
     border-radius: 50px;
     position: absolute;
     z-index: 4;
@@ -238,13 +228,13 @@ input:focus, textarea {
     background: #DFE3E6;
 }
 
-.absolute-trash-icon{
+.absolute-trash-icon {
     font-size: 30px !important;
     padding: 10px;
     color: #738FA3;
 }
 
-.transform-trash{
+.transform-trash {
     transform: translateY(-100px);
 }
 
@@ -259,7 +249,6 @@ input:focus, textarea {
     padding: 10px;
     transition: height 200ms, padding 200ms, margin 200ms, opacity 200ms;
     margin: 8px 2px;
-
 }
 
 .grey-text-color {
@@ -269,5 +258,3 @@ input:focus, textarea {
     -webkit-user-select: none;
     user-select: none;
 }
-
-

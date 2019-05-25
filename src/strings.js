@@ -3,6 +3,7 @@ class Word {
     constructor(text) {
         this.text = text;
     }
+
     t() {
         let args = [...arguments], i = 0;
         return this.text.replace(/%/g, () => {
@@ -14,6 +15,7 @@ class Word {
         });
     }
 }
+
 window.strings = {
     /**Usual strings */
     backgroundPath: new Word('background.png'),
@@ -26,8 +28,7 @@ window.strings = {
 <div class="selectable-area column-header">
    %
 </div>
-<div class="cards-list" >
-</div>
+<div class="cards-list" ></div>
 <div class="column-grey-footer" onclick="openTaskInput(this)">
    <i class="material-icons column-icon">
    add
@@ -77,7 +78,7 @@ window.strings = {
    </div>
 </div>
 `),
-    oneMoreCardPart: new Word( `
+    oneMoreCardPart: new Word(`
 <div class="column-grey-footer" onclick="openTaskInput(this)">
    <i class="material-icons column-icon">
    add
@@ -85,7 +86,7 @@ window.strings = {
    <div>Добавить ещё одну карточку</div>
 </div>
 `),
-    cardContainerBodyInputState: new Word( `
+    cardContainerBodyInputState: new Word(`
 <div class="input-block">
    <div class="white-card">
       <textarea type="text" class="textarea" onkeyup="saveTaskName(event)" placeholder="Введите название карточки"></textarea>

@@ -418,6 +418,3 @@ function initPage() {
     document.onmouseup = mouseupWindowListener;
 
 }
-
-
-
