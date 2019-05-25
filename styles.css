@@ -46,7 +46,12 @@ input:focus, textarea {
 
 .column-header {
     font-weight: bold;
+    max-height: 30px;
+    overflow: hidden;
     padding-bottom: 5px;
+}
+.lock-scroll{
+    overflow: hidden !important;
 }
 
 .column-grey-footer {
@@ -191,7 +196,7 @@ input:focus, textarea {
 }
 
 .card-list-with-input {
-    max-height: calc(100vh - 184px) !important;
+    max-height: calc(100vh - 210px) !important;
 }
 
 .textarea {
@@ -207,15 +212,18 @@ input:focus, textarea {
     border-radius: 50px;
     position: absolute;
     z-index: 4;
-    left: calc(100vw / 2);
+    left: calc(100vw / 2 - 28px);
     bottom: -70px;
     transition: transform 300ms;
     background: #DFE3E6;
 }
+
 .absolute-trash-icon{
-    font-size: 30px;
+    font-size: 35px !important;
     padding: 10px;
+    color: #738FA3;
 }
+
 .transform-trash{
     transform: translateY(-100px);
 }

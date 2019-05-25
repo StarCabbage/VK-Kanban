@@ -119,6 +119,9 @@ function mousedownLocalListener(event) {
 
         document.body.appendChild(clone_node);
 
+        if (yOff > 80) {
+            yOff = 75;
+        }
         clone_node.style.left = `${initialX - xOff}px`;
         clone_node.style.top = `${initialY - yOff}px`;
         window.absoluteCard = clone_node;
@@ -327,28 +330,37 @@ function saveTaskName(ev) {
             input.value = "";
         }
 
+
         if (title !== "") {
             let id = kanbanManager.saveColumnCard(title, column.id);
-            let card_container = ev.target.closest('.column-container');
-            let input_block = card_container.getElementsByClassName('input_block')[0];
+            let column_container = ev.target.closest('.column-container');
+            let input_block = column_container.getElementsByClassName('input_block')[0];
             removeElement(input_block);
-            let cards_list = card_container.getElementsByClassName('cards_list')[0];
+            let cards_list = column_container.getElementsByClassName('cards_list')[0];
             cards_list.classList.remove('card-list-with-input');
             cards_list.innerHTML += window.strings.card_body.t(id, title);
 
-            card_container.innerHTML += window.strings.one_more_card_part.t();
+
+            column_container.innerHTML += window.strings.one_more_card_part.t();
+            column_container.getElementsByClassName('cards_list')[0].scrollTo({
+                top: 5999,
+                left: 0,
+                behavior: 'smooth'
+            });
         } else {
             alert('Заполните поле');
         }
     }
 }
 
+
 function openTaskInput(ev) {
-    let card_container = ev.closest('.column-container');
+    let column_container = ev.closest('.column-container');
     removeElement(ev);
-    let cards_list = card_container.getElementsByClassName('cards_list')[0];
+    let cards_list = column_container.getElementsByClassName('cards_list')[0];
+    column_container.classList.add('card-list-with-input');
     cards_list.classList.add('card-list-with-input');
-    card_container.innerHTML += window.strings.card_container_body_input_state.t();
+    column_container.innerHTML += window.strings.card_container_body_input_state.t();
 }
 
 function isStringEmpty(str) {
@@ -368,8 +380,12 @@ function saveColumnName(ev) {
 
             input.value = "";
         }
+
         if (title !== "") {
             ev.target.closest('.column').id = kanbanManager.saveColumn(title);
+            if (title.length > 50){
+                title = title.substring(0,30) +"...";
+            }
             column.getElementsByClassName('column-container')[0].innerHTML = window.strings.column_name.t(title);
         } else {
             alert("Заполните поле")
@@ -424,15 +440,13 @@ function initPage() {
 }
 
 let active = false;
-let currentX;
-let currentY;
 let initialX;
 let initialY;
 let xOffset = 0;
 let yOffset = 0;
 let xOff = 0;
 let yOff = 0;
-let time_out = false;
+
 
 
 
