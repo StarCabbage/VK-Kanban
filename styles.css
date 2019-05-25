@@ -49,10 +49,9 @@ input:focus, textarea {
     max-height: 30px;
     overflow: hidden;
     padding-bottom: 5px;
+    margin-bottom: 10px;
 }
-.lock-scroll{
-    overflow: hidden !important;
-}
+
 
 .column-grey-footer {
     color: #6B808C;

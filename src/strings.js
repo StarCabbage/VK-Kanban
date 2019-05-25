@@ -37,7 +37,7 @@ window.strings = {
         </div>`),
     column_element: new Word(`<div class="column column-main-font button column">
                                         <div class="column-container selectable-area">
-                                            <div class="grey-text-color" style="display: flex; 
+                                            <div class="grey-text-color"  style="display: flex; 
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
                                                                                         add
                                                                                      </i>
@@ -61,7 +61,7 @@ window.strings = {
                 </i>
 
             </div>`),
-    card_container_body_delete: new Word(`<div class="grey-text-color" onclick="openTaskInput(this)" style="display: flex; 
+    card_container_body_delete: new Word(`<div class="grey-text-color" onmouseover="mouseoverLocalListener(event)" onclick="openTaskInput(this)" style="display: flex; 
     align-items: center;"><i class="material-icons" style="padding-right: 5px;">
             add
         </i>

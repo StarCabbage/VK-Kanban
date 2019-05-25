@@ -333,16 +333,17 @@ function saveTaskName(ev) {
 
         if (title !== "") {
             let id = kanbanManager.saveColumnCard(title, column.id);
-            let column_container = ev.target.closest('.column-container');
-            let input_block = column_container.getElementsByClassName('input_block')[0];
+            let card_container = ev.target.closest('.column-container');
+            let input_block = card_container.getElementsByClassName('input_block')[0];
             removeElement(input_block);
-            let cards_list = column_container.getElementsByClassName('cards_list')[0];
+            let cards_list = card_container.getElementsByClassName('cards_list')[0];
             cards_list.classList.remove('card-list-with-input');
             cards_list.innerHTML += window.strings.card_body.t(id, title);
 
 
-            column_container.innerHTML += window.strings.one_more_card_part.t();
-            column_container.getElementsByClassName('cards_list')[0].scrollTo({
+            card_container.innerHTML += window.strings.one_more_card_part.t();
+
+            card_container.getElementsByClassName('cards_list')[0].scrollTo({
                 top: 5999,
                 left: 0,
                 behavior: 'smooth'
@@ -355,12 +356,13 @@ function saveTaskName(ev) {
 
 
 function openTaskInput(ev) {
-    let column_container = ev.closest('.column-container');
+    let card_container = ev.closest('.column-container');
     removeElement(ev);
-    let cards_list = column_container.getElementsByClassName('cards_list')[0];
-    column_container.classList.add('card-list-with-input');
+    let cards_list = card_container.getElementsByClassName('cards_list')[0];
     cards_list.classList.add('card-list-with-input');
-    column_container.innerHTML += window.strings.card_container_body_input_state.t();
+    card_container.innerHTML += window.strings.card_container_body_input_state.t();
+    let column_id = cards_list.closest('.column').id;
+    cards_list.closest('.cards_list').scrollTo(0, 5999); //ne rabot
 }
 
 function isStringEmpty(str) {
@@ -383,8 +385,8 @@ function saveColumnName(ev) {
 
         if (title !== "") {
             ev.target.closest('.column').id = kanbanManager.saveColumn(title);
-            if (title.length > 50){
-                title = title.substring(0,30) +"...";
+            if (title.length > 65){
+                title = title.substring(0,60) +"...";
             }
             column.getElementsByClassName('column-container')[0].innerHTML = window.strings.column_name.t(title);
         } else {
