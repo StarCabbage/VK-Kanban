@@ -28,8 +28,10 @@ function mouseoverLocalListener(event) {
 }
 
 function mousemoveWindowListener(event) {
+
     if (window.absoluteCard) {
         let eventDoc, doc, body;
+        console.log(window.last_highlight);
 
 
         event = event || window.event;
@@ -51,14 +53,20 @@ function mousemoveWindowListener(event) {
         initialX = event.pageX;
         initialY = event.pageY;
 
+        console.log(initialX+" "+initialY);
+        console.log(event.clientX+" "+event.clientY);
+        console.log(event);
+
+        console.log(document.elementFromPoint(initialX, initialY));
+        console.log(document.elementFromPoint(initialX, initialY).closest('.card')||document.elementFromPoint(initialX, initialY).closest('.column'));
 
         window.absoluteCard.style.top = `${event.pageY - yOff}px`;
         window.absoluteCard.style.left = `${event.pageX - xOff}px`;
 
 
         if (window.last_highlight) {
-            if (initialY < last_highlight.offsetTop || initialY > last_highlight.offsetTop + last_highlight.offsetHeight ||
-                initialX < last_highlight.offsetLeft || initialX > last_highlight.offsetLeft + last_highlight.offsetWidth
+            if (initialY < last_highlight.element.offsetTop || initialY > last_highlight.element.offsetTop + last_highlight.element.offsetHeight ||
+                initialX < last_highlight.element.offsetLeft || initialX > last_highlight.element.offsetLeft + last_highlight.element.offsetWidth
             ) {
                 removeHighlight();
                 window.last_mouse_over_element = null;
@@ -361,8 +369,8 @@ function openTaskInput(ev) {
     let cards_list = card_container.getElementsByClassName('cards_list')[0];
     cards_list.classList.add('card-list-with-input');
     card_container.innerHTML += window.strings.card_container_body_input_state.t();
-    let column_id = cards_list.closest('.column').id;
-    cards_list.closest('.cards_list').scrollTo(0, 5999); //ne rabot
+
+    //cards_list.closest('.cards_list').scrollTo(0, 5999); //ne rabot
 }
 
 function isStringEmpty(str) {
