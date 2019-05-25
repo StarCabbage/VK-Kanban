@@ -32,7 +32,7 @@ textarea {
     outline: none !important;
 }
 
-.column-main-font {
+.column-main-font * {
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
     font-style: normal;
     font-weight: normal;
@@ -49,7 +49,6 @@ textarea {
 }
 
 .column-grey-footer {
-    color: #6B808C;
     margin-top: 7px;
     display: flex;
     align-items: center;
@@ -57,6 +56,9 @@ textarea {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+.column-grey-footer *{
+    color: #6B808C;
 }
 
 .removable {
@@ -152,7 +154,8 @@ textarea {
     -ms-user-select: none;
     user-select: none;
     opacity: 1;
-    overflow: scroll;
+    overflow-y: paged-y;
+    overflow-y: -webkit-paged-y;
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
     font-style: normal;
     font-weight: normal;
@@ -243,9 +246,7 @@ textarea {
     border-radius: 3px;
     -webkit-box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 1px 3px 0 rgba(0, 0, 0, .12);
     box-shadow: 0 2px 1px -1px rgba(0, 0, 0, .2), 0 1px 1px 0 rgba(0, 0, 0, .14), 0 1px 3px 0 rgba(0, 0, 0, .12);
-    color: black;
     word-break: break-word;
-    font-weight: 400;
     padding: 10px;
     transition: height 200ms, padding 200ms, margin 200ms, opacity 200ms;
     margin: 8px 2px;

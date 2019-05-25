@@ -14,7 +14,6 @@ let yOff = 0;
 function mousemoveWindowListener(event) {
     if (window.absoluteCard) {
         let eventDoc, doc, body;
-        console.log(window.lastHighlight);
 
         event = event || window.event;
 
@@ -105,6 +104,7 @@ function mousedownLocalListener(event) {
         cloneNode.removeAttribute('onmouseover');
         cloneNode.removeAttribute('onmousedown');
 
+        if (event.target.offsetHeight)
         cloneNode.style.height = `${event.target.offsetHeight - 20}px`;
         cloneNode.style.width = `${event.target.offsetWidth - 20}px`;
 
@@ -148,7 +148,6 @@ function mouseupWindowListener(event) {
         if (event.target.closest('.absolute-trash')) {
             let touchedElement = document.getElementById(window.touchedElement.id);
             let oldColumnId = touchedElement.closest('.column').id;
-            console.log(oldColumnId + " " + touchedElement.id);
             window.kanbanManager.removeColumnCard(touchedElement.id, oldColumnId);
             removeElement(touchedElement);
         } else {
