@@ -46,17 +46,29 @@ input:focus, textarea {
 
 .column-header {
     font-weight: bold;
-    max-height: 30px;
+    max-height: 33px;
     overflow: hidden;
-    padding-bottom: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 
 .column-grey-footer {
     color: #6B808C;
+    margin-top: 9px;
+    display: flex;
+    align-items: center;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
+.removable{
+    margin-bottom: 8px;
+}
+.column-icon{
+    padding-right: 5px;
+}
 .column {
     flex: 0 0 auto;
     width: 272px;
@@ -91,7 +103,9 @@ input:focus, textarea {
     border-radius: 3px;
     background: #39C071;
 }
-
+.green-column-footer{
+    justify-content: space-between;
+}
 .scrolling-wrapper-flex-box {
     display: flex;
     flex-wrap: nowrap;
@@ -142,7 +156,7 @@ input:focus, textarea {
     -ms-user-select: none;
     user-select: none;
     opacity: 1;
-    overflow: hidden;
+    overflow: scroll;
 
 
     font-family: -apple-system, BlinkMacSystemFont, Roboto, Helvetica Neue, sans-serif;
@@ -153,6 +167,9 @@ input:focus, textarea {
 
     color: #000000;
 }
+.absolute-half-visible-card {
+    opacity: .5 !important;
+}
 
 .absolute-invisible-card {
     opacity: 0 !important;
@@ -160,7 +177,8 @@ input:focus, textarea {
 
 .space-elements::before,
 .space-elements::after {
-    content: " ";
+    content: open-quote;
+    visibility: hidden;
     width: 10px;
     height: 1px;
 }
@@ -187,15 +205,14 @@ input:focus, textarea {
     user-select: all !important;
 }
 
-.cards_list {
+.cards-list {
     width: 100%;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
-    min-height: 12px;
 }
 
 .card-list-with-input {
-    max-height: calc(100vh - 210px) !important;
+    max-height: calc(100vh - 220px) !important;
 }
 
 .textarea {
@@ -211,14 +228,14 @@ input:focus, textarea {
     border-radius: 50px;
     position: absolute;
     z-index: 4;
-    left: calc(100vw / 2 - 28px);
+    left: calc(100vw / 2 - 25px);
     bottom: -70px;
     transition: transform 300ms;
     background: #DFE3E6;
 }
 
 .absolute-trash-icon{
-    font-size: 35px !important;
+    font-size: 30px !important;
     padding: 10px;
     color: #738FA3;
 }

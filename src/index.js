@@ -6,26 +6,6 @@ window.timer_time_out = null;
 
 
 /**Listeners */
-function mouseoverLocalListener(event) {
-
-    if (window.absoluteCard) {
-        window.last_event = event;
-        if (event.target.closest('.task-block')) {
-            if (window.last_mouse_over_element !== event.target.closest('.task-block')) {
-                removeHighlight(); //Удаление подсветки места для вставки карточки
-                window.highlight = true;
-                window.last_mouse_over_element = event.target.closest('.task-block');
-            }
-        } else if (event.target.closest('.column')) {
-            let column = event.target.closest('.column');
-            if (window.last_mouse_over_element !== column) {
-                removeHighlight(); //Удаление подсветки места для вставки карточки
-                window.highlight = true;
-                window.last_mouse_over_element = column;
-            }
-        }
-    }
-}
 
 function mousemoveWindowListener(event) {
 
@@ -53,32 +33,49 @@ function mousemoveWindowListener(event) {
         initialX = event.pageX;
         initialY = event.pageY;
 
-        console.log(initialX+" "+initialY);
-        console.log(event.clientX+" "+event.clientY);
+        console.log(initialX + " " + initialY);
+        console.log(event.clientX + " " + event.clientY);
         console.log(event);
 
         console.log(document.elementFromPoint(initialX, initialY));
-        console.log(document.elementFromPoint(initialX, initialY).closest('.card')||document.elementFromPoint(initialX, initialY).closest('.column'));
+        console.log(document.elementFromPoint(initialX, initialY).closest('.card') || document.elementFromPoint(initialX, initialY).closest('.column'));
+
+        let trash = false;
+        let over_element = document.elementFromPoint(initialX, initialY);
+        if (over_element.closest('.task-block')) {
+            over_element = over_element.closest('.task-block');
+        } else if (over_element.closest('.column')) {
+            over_element = over_element.closest('.column');
+        } else if (over_element.closest('.absolute-trash')) {
+            over_element = null;
+            trash = true;
+            window.absoluteCard.classList.add('absolute-half-visible-card');
+        } else {
+            over_element = null;
+        }
+        if (!trash && window.absoluteCard.classList.contains('absolute-half-visible-card')) window.absoluteCard.classList.remove('absolute-half-visible-card');
 
         window.absoluteCard.style.top = `${event.pageY - yOff}px`;
         window.absoluteCard.style.left = `${event.pageX - xOff}px`;
 
 
-        if (window.last_highlight) {
-            if (initialY < last_highlight.element.offsetTop || initialY > last_highlight.element.offsetTop + last_highlight.element.offsetHeight ||
-                initialX < last_highlight.element.offsetLeft || initialX > last_highlight.element.offsetLeft + last_highlight.element.offsetWidth
-            ) {
+        if (over_element) {
+            if (window.last_mouse_over_element) {
+                if (window.last_mouse_over_element !== over_element) {
+                    removeHighlight();
+                    window.last_mouse_over_element = over_element;
+                    addHighlight();
+                }
+            } else {
+                window.last_mouse_over_element = over_element;
+                addHighlight();
+            }
+        } else {
+            if (window.last_mouse_over_element) {
                 removeHighlight();
                 window.last_mouse_over_element = null;
             }
         }
-        if (window.highlight) {
-            window.highlight = false;
-            addHighlight();
-
-
-        }
-
 
     }
 }
@@ -109,16 +106,12 @@ function mousedownLocalListener(event) {
 
         window.touch_card = event.target;
 
-
-        event.target.closest('.task-block').removeAttribute('onmouseover');
-        event.target.closest('.task-block').removeEventListener('mouseover', mouseoverLocalListener);
-
         let clone_node = event.target.cloneNode(true);
         clone_node.classList.add('absolute-card');
 
         clone_node.removeAttribute('onmouseover');
         clone_node.removeAttribute('onmousedown');
-        clone_node.style.height = `${clone_node.offsetHeight - 20}px`;
+        clone_node.style.height = `${event.target.offsetHeight - 20}px`;
         clone_node.style.width = `${event.target.offsetWidth - 20}px`;
         clone_node.classList.add('nice-font');
         window.event = null;
@@ -163,7 +156,8 @@ function mouseupWindowListener(event) {
         if (event.target.closest('.absolute-trash')) {
             let touched_element = document.getElementById(window.touched_element.id);
             let oldColumnId = touched_element.closest('.column').id;
-            window.kanbanManager.removeColumnCard(window.touched_element.id, oldColumnId);
+            console.log(oldColumnId+" "+touched_element.id);
+            window.kanbanManager.removeColumnCard(touched_element.id, oldColumnId);
             removeElement(touched_element);
         } else {
             if (highlight_cards.length !== 0 && window.time_out) {
@@ -183,16 +177,15 @@ function mouseupWindowListener(event) {
                         break;
                     }
                 }
-                let card_list = x_column.getElementsByClassName('cards_list')[0];
+                let cards_list = x_column.getElementsByClassName('cards-list')[0];
                 clone_node.getElementsByClassName('white-card')[0].classList.remove('invisible-card');
-                clone_node.setAttribute('onmouseover', "mouseoverLocalListener(event)");
-                clone_node.addEventListener('mouseover', mouseoverLocalListener);
                 if (position === -1) {
-                    card_list.appendChild(clone_node);
+                    cards_list.appendChild(clone_node);
+                    cards_list.scrollTo(0, 9999);
                     window.kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, count + 1);
                 } else {
                     let x_task_blocks = x_column.getElementsByClassName('task-block');
-                    card_list.insertBefore(clone_node, x_task_blocks[position]);
+                    cards_list.insertBefore(clone_node, x_task_blocks[position]);
                     window.kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, position);
                 }
 
@@ -201,8 +194,6 @@ function mouseupWindowListener(event) {
 
 
                 document.getElementById(window.touched_element.id).getElementsByClassName('white-card')[0].classList.remove('invisible-card'); //это из-за веселого бага)))
-                document.getElementById(window.touched_element.id).setAttribute('onmouseover', "mouseoverLocalListener(event)");
-                document.getElementById(window.touched_element.id).addEventListener('mouseover', mouseoverLocalListener);
                 window.touch_card.classList.remove('invisible-card');
 
 
@@ -256,10 +247,12 @@ function addHighlight() {
     if (window.last_mouse_over_element.classList.contains('column')) {
 
 
-        let cards_list = window.last_mouse_over_element.getElementsByClassName('cards_list')[0];
-        cards_list.innerHTML += window.strings.removable_highlight.t();
+        let cards_list = window.last_mouse_over_element.getElementsByClassName('cards-list')[0];
+        cards_list.appendChild(createElementFromHTML(window.strings.removable_highlight.t()));
+
         cards_list.getElementsByClassName('removable')[0].style.height = `${window.absoluteCard.offsetHeight - 20}px`;
         window.last_highlight.element = cards_list.getElementsByClassName('removable')[0];
+        cards_list.scrollTo(0, 9999);
 
 
     } else {
@@ -267,6 +260,7 @@ function addHighlight() {
         let place_to_insert = window.last_mouse_over_element.getElementsByClassName('place-to-insert')[0];
         place_to_insert.classList.add('highlight-card');
         place_to_insert.style.height = `${window.absoluteCard.offsetHeight - 20}px`;
+        place_to_insert.closest('.cards-list').scrollTo(0, place_to_insert.offsetTop - 100);
         window.last_highlight.element = place_to_insert;
 
     }
@@ -319,7 +313,7 @@ function closeColumn(ev) {
 function closeTaskInput(ev) {
     let card_container = ev.closest('.column-container');
     removeElement(ev.closest('.input_block'));
-    card_container.innerHTML += window.strings.card_container_body_delete.t();
+    card_container.appendChild(createElementFromHTML(window.strings.card_container_body_delete.t()));
 }
 
 function saveTaskName(ev) {
@@ -344,15 +338,15 @@ function saveTaskName(ev) {
             let card_container = ev.target.closest('.column-container');
             let input_block = card_container.getElementsByClassName('input_block')[0];
             removeElement(input_block);
-            let cards_list = card_container.getElementsByClassName('cards_list')[0];
+            let cards_list = card_container.getElementsByClassName('cards-list')[0];
             cards_list.classList.remove('card-list-with-input');
-            cards_list.innerHTML += window.strings.card_body.t(id, title);
+            cards_list.appendChild(createElementFromHTML(window.strings.card_body.t(id, title)));
+
+            card_container.appendChild(createElementFromHTML(window.strings.one_more_card_part.t()));
 
 
-            card_container.innerHTML += window.strings.one_more_card_part.t();
-
-            card_container.getElementsByClassName('cards_list')[0].scrollTo({
-                top: 5999,
+            card_container.getElementsByClassName('cards-list')[0].scrollTo({
+                top: 9999,
                 left: 0,
                 behavior: 'smooth'
             });
@@ -362,15 +356,20 @@ function saveTaskName(ev) {
     }
 }
 
+function createElementFromHTML(htmlString) {
+    let div = document.createElement('div');
+    div.innerHTML = htmlString.trim();
+    return div.firstChild;
+}
 
 function openTaskInput(ev) {
     let card_container = ev.closest('.column-container');
     removeElement(ev);
-    let cards_list = card_container.getElementsByClassName('cards_list')[0];
+    let cards_list = card_container.getElementsByClassName('cards-list')[0];
     cards_list.classList.add('card-list-with-input');
-    card_container.innerHTML += window.strings.card_container_body_input_state.t();
-
-    //cards_list.closest('.cards_list').scrollTo(0, 5999); //ne rabot
+    //card_container.innerHTML += window.strings.card_container_body_input_state.t();
+    card_container.appendChild(createElementFromHTML(window.strings.card_container_body_input_state.t()));
+    //cards-list.closest('.cards-list').scrollTo(0, 5999); //ne rabot
 }
 
 function isStringEmpty(str) {
@@ -393,8 +392,8 @@ function saveColumnName(ev) {
 
         if (title !== "") {
             ev.target.closest('.column').id = kanbanManager.saveColumn(title);
-            if (title.length > 65){
-                title = title.substring(0,60) +"...";
+            if (title.length > 65) {
+                title = title.substring(0, 60) + "...";
             }
             column.getElementsByClassName('column-container')[0].innerHTML = window.strings.column_name.t(title);
         } else {
