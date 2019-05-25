@@ -15,8 +15,8 @@ class KanbanManager {
         }
     }
     static isObjectEmpty(obj) {
-        for(let key in obj) {
-            if(obj.hasOwnProperty(key))
+        for (let key in obj) {
+            if (obj.hasOwnProperty(key))
                 return false;
         }
         return true;
@@ -27,29 +27,31 @@ class KanbanManager {
         this.columnArray = data.columnArray;
         this.columnsData = data.columnsData;
         this.columns = data.columns;
-        let columns_body = document.getElementById('columnBox');
+        let columnsBody = document.getElementById('columnBox');
         for (let i = 0, length = this.columnArray.length; i < length; i++) {
-            let cards_list = "";
+            let cardsList = "";
             if (!KanbanManager.isObjectEmpty(this.columnsData)) {
                 for (let j = 0, j_length = this.columnsData[i].length; j < j_length; j++) {
-                    cards_list += window.strings.card_ready_pattern.t(this.columnsData[i][j], this.cardsArray[this.columnsData[i][j]]);
+                    cardsList += window.strings.cardReadyPattern.t(this.columnsData[i][j], this.cardsArray[this.columnsData[i][j]]);
                 }
             }
-            let column = window.strings.column_ready_pattern.t(i, this.columnArray[i], cards_list);
-            columns_body.innerHTML += column;
+            let column = window.strings.columnReadyRattern.t(i, this.columnArray[i], cardsList);
+            columnsBody.innerHTML += column;
         }
-        let columnButtonElement = window.strings.column_element.t();
-        columns_body.appendChild(createElementFromHTML(columnButtonElement));
-        let column_element = document.getElementsByClassName("column");
-        column_element = column_element[column_element.length - 1];
+        let columnButtonElement = window.strings.columnElement.t();
+        columnsBody.appendChild(createElementFromHTML(columnButtonElement));
+        let columnElement = document.getElementsByClassName("column");
+        columnElement = columnElement[columnElement.length - 1];
 
-        column_element.addEventListener('click', () => {
+        columnElement.addEventListener('click', () => {
 
-            removeElement(column_element.getElementsByClassName('column-grey-footer')[0]);
-            let cardContainer = column_element.getElementsByClassName('column-container')[0];
-            cardContainer.appendChild(createElementFromHTML(window.strings.card_container_body.t()));
+            removeElement(columnElement.getElementsByClassName('column-grey-footer')[0]);
+            let cardContainer = columnElement.getElementsByClassName('column-container')[0];
+            cardContainer.appendChild(createElementFromHTML(window.strings.cardContainerBody.t()));
             this.addColumn();
-        }, {once: true});
+        }, {
+            once: true
+        });
     }
 
     writeLocal() {
@@ -82,8 +84,8 @@ class KanbanManager {
 
     removeColumnCard(id, columnId) {
         let num = parseInt(columnId.split('_')[1]);
-        let card_id = parseInt(id.split('_')[1]);
-        let index = this.columnsData[num].indexOf(card_id);
+        let cardId = parseInt(id.split('_')[1]);
+        let index = this.columnsData[num].indexOf(cardId);
         if (!this.columnsData[num]) this.columnsData[num] = [];
         this.columnsData[num].splice(index, 1);
         this.writeLocal();
@@ -91,10 +93,10 @@ class KanbanManager {
 
     appendColumnCard(id, columnId, position) {
         let num = parseInt(columnId.split('_')[1]);
-        let card_id = parseInt(id.split('_')[1]);
+        let cardId = parseInt(id.split('_')[1]);
         let index = position;
         if (!this.columnsData[num]) this.columnsData[num] = [];
-        this.columnsData[num].splice(index, 0, card_id);
+        this.columnsData[num].splice(index, 0, cardId);
 
     }
 
@@ -105,18 +107,20 @@ class KanbanManager {
     }
 
     addColumn() {
-        let columnButtonElement = window.strings.column_element.t();
+        let columnButtonElement = window.strings.columnElement.t();
         document.getElementById('columnBox').appendChild(createElementFromHTML(columnButtonElement));
-        let column_element = document.getElementsByClassName("column");
-        column_element = column_element[column_element.length - 1];
+        let columnElement = document.getElementsByClassName("column");
+        columnElement = columnElement[columnElement.length - 1];
 
-        column_element.addEventListener('click', () => {
+        columnElement.addEventListener('click', () => {
 
-            removeElement(column_element.getElementsByClassName('column-grey-footer')[0]);
-            let cardContainer = column_element.getElementsByClassName('column-container')[0];
-            cardContainer.appendChild(createElementFromHTML(window.strings.card_container_body.t()));
+            removeElement(columnElement.getElementsByClassName('column-grey-footer')[0]);
+            let cardContainer = columnElement.getElementsByClassName('column-container')[0];
+            cardContainer.appendChild(createElementFromHTML(window.strings.cardContainerBody.t()));
             this.addColumn();
-        }, {once: true});
+        }, {
+            once: true
+        });
 
 
     }

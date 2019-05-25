@@ -1,21 +1,22 @@
 /**Global Values */
 window.absoluteCard = null;
 window.highlight = false;
-window.last_mouse_over_element = null;
-window.timer_time_out = null;
-
+window.lastMouseOverElement = null;
+window.timerTimeOut = null;
+let initialX = 0;
+let initialY = 0;
+let xOff = 0;
+let yOff = 0;
 
 /**Listeners */
 
+//Mouse Listeners
 function mousemoveWindowListener(event) {
-
     if (window.absoluteCard) {
         let eventDoc, doc, body;
-        console.log(window.last_highlight);
-
+        console.log(window.lastHighlight);
 
         event = event || window.event;
-
 
         if (event.pageX == null && event.clientX != null) {
             eventDoc = (event.target && event.target.ownerDocument) || document;
@@ -33,47 +34,39 @@ function mousemoveWindowListener(event) {
         initialX = event.pageX;
         initialY = event.pageY;
 
-        console.log(initialX + " " + initialY);
-        console.log(event.clientX + " " + event.clientY);
-        console.log(event);
-
-        console.log(document.elementFromPoint(initialX, initialY));
-        console.log(document.elementFromPoint(initialX, initialY).closest('.card') || document.elementFromPoint(initialX, initialY).closest('.column'));
-
         let trash = false;
-        let over_element = document.elementFromPoint(initialX, initialY);
-        if (over_element.closest('.task-block')) {
-            over_element = over_element.closest('.task-block');
-        } else if (over_element.closest('.column')) {
-            over_element = over_element.closest('.column');
-        } else if (over_element.closest('.absolute-trash')) {
-            over_element = null;
+        let overElement = document.elementFromPoint(initialX, initialY);
+        if (overElement.closest('.task-block')) {
+            overElement = overElement.closest('.task-block');
+        } else if (overElement.closest('.column') && overElement.closest('.column').id) {
+            overElement = overElement.closest('.column');
+        } else if (overElement.closest('.absolute-trash')) {
+            overElement = null;
             trash = true;
             window.absoluteCard.classList.add('absolute-half-visible-card');
         } else {
-            over_element = null;
+            overElement = null;
         }
         if (!trash && window.absoluteCard.classList.contains('absolute-half-visible-card')) window.absoluteCard.classList.remove('absolute-half-visible-card');
 
         window.absoluteCard.style.top = `${event.pageY - yOff}px`;
         window.absoluteCard.style.left = `${event.pageX - xOff}px`;
 
-
-        if (over_element) {
-            if (window.last_mouse_over_element) {
-                if (window.last_mouse_over_element !== over_element) {
+        if (overElement) {
+            if (window.lastMouseOverElement) {
+                if (window.lastMouseOverElement !== overElement) {
                     removeHighlight();
-                    window.last_mouse_over_element = over_element;
+                    window.lastMouseOverElement = overElement;
                     addHighlight();
                 }
             } else {
-                window.last_mouse_over_element = over_element;
+                window.lastMouseOverElement = overElement;
                 addHighlight();
             }
         } else {
-            if (window.last_mouse_over_element) {
+            if (window.lastMouseOverElement) {
                 removeHighlight();
-                window.last_mouse_over_element = null;
+                window.lastMouseOverElement = null;
             }
         }
 
@@ -83,122 +76,122 @@ function mousemoveWindowListener(event) {
 function mousedownLocalListener(event) {
     event.preventDefault();
     if (event.button === 0 && (event.metaKey || event.ctrlKey)) {
-        window.time_out = false;
-        if (window.timer_time_out) {
-            clearTimeout(window.timer_time_out);
+        window.timeOut = false;
+        if (window.timerTimeOut) {
+            clearTimeout(window.timerTimeOut);
         }
-        window.timer_time_out = setTimeout(function () {
-            window.time_out = true;
+        window.timerTimeOut = setTimeout(function () {
+            window.timeOut = true;
         }, 400);
         if (event.target.classList.contains('selectable-card')) {
             event.target.classList.remove('selectable-card');
         }
 
         if (event.type === "touchstart") {
-            initialX = event.touches[0].clientX - xOffset;
-            initialY = event.touches[0].clientY - yOffset;
+            initialX = event.touches[0].clientX;
+            initialY = event.touches[0].clientY;
         } else {
-            initialX = event.clientX - xOffset;
-            initialY = event.clientY - yOffset;
+            initialX = event.clientX;
+            initialY = event.clientY;
         }
 
-        window.touched_element = event.target.closest('.task-block');
+        window.touchedElement = event.target.closest('.task-block');
 
-        window.touch_card = event.target;
+        window.touchCard = event.target;
 
-        let clone_node = event.target.cloneNode(true);
-        clone_node.classList.add('absolute-card');
+        let cloneNode = event.target.cloneNode(true);
+        cloneNode.classList.add('absolute-card');
 
-        clone_node.removeAttribute('onmouseover');
-        clone_node.removeAttribute('onmousedown');
-        clone_node.style.height = `${event.target.offsetHeight - 20}px`;
-        clone_node.style.width = `${event.target.offsetWidth - 20}px`;
-        clone_node.classList.add('nice-font');
+        cloneNode.removeAttribute('onmouseover');
+        cloneNode.removeAttribute('onmousedown');
+
+        cloneNode.style.height = `${event.target.offsetHeight - 20}px`;
+        cloneNode.style.width = `${event.target.offsetWidth - 20}px`;
+
+        cloneNode.classList.add('nice-font');
+
         window.event = null;
+
         xOff = event.offsetX;
         yOff = event.offsetY;
 
-        document.body.appendChild(clone_node);
+        document.body.appendChild(cloneNode);
 
         if (yOff > 80) {
             yOff = 75;
         }
-        clone_node.style.left = `${initialX - xOff}px`;
-        clone_node.style.top = `${initialY - yOff}px`;
-        window.absoluteCard = clone_node;
-        document.getElementsByClassName('absolute-trash')[0].classList.add('transform-trash');
 
+        cloneNode.style.left = `${initialX - xOff}px`;
+        cloneNode.style.top = `${initialY - yOff}px`;
+
+        window.absoluteCard = cloneNode;
+        document.getElementsByClassName('absolute-trash')[0].classList.add('transform-trash');
         event.target.classList.add('invisible-card');
 
-        active = true;
-
     } else {
-
         if (!event.target.classList.contains('selectable-card')) {
             event.target.classList.add('selectable-card');
         } else {
             event.target.classList.remove('selectable-card');
         }
         selectText(event.target);
-
     }
-
 }
 
 function mouseupWindowListener(event) {
-
-
     if (window.absoluteCard) {
         window.absoluteCard.classList.add('absolute-invisible-card');
-
         document.body.style.pointerEvents = "none";
-        let highlight_cards = document.getElementsByClassName('highlight-card');
+
+        let highlightCards = document.getElementsByClassName('highlight-card');
+
         if (event.target.closest('.absolute-trash')) {
-            let touched_element = document.getElementById(window.touched_element.id);
-            let oldColumnId = touched_element.closest('.column').id;
-            console.log(oldColumnId+" "+touched_element.id);
-            window.kanbanManager.removeColumnCard(touched_element.id, oldColumnId);
-            removeElement(touched_element);
+            let touchedElement = document.getElementById(window.touchedElement.id);
+            let oldColumnId = touchedElement.closest('.column').id;
+            console.log(oldColumnId + " " + touchedElement.id);
+            window.kanbanManager.removeColumnCard(touchedElement.id, oldColumnId);
+            removeElement(touchedElement);
         } else {
-            if (highlight_cards.length !== 0 && window.time_out) {
-                let touched_element = document.getElementById(window.touched_element.id);
-                let clone_node = touched_element.cloneNode(true);
-                let oldColumnId = touched_element.closest('.column').id;
-                removeElement(touched_element);
-                let x_column = highlight_cards[0].closest('.column');
-                let list_possible_highlights = x_column.getElementsByClassName('place-to-insert');
+            if (highlightCards.length !== 0 && window.timeOut) {
+                let localTouchedElement = document.getElementById(window.touchedElement.id);
+                let cloneNode = localTouchedElement.cloneNode(true);
+                let oldColumnId = localTouchedElement.closest('.column').id;
+                removeElement(localTouchedElement);
+                let xColumn = highlightCards[0].closest('.column');
+                let listPossibleHighlights = xColumn.getElementsByClassName('place-to-insert');
                 let count = 0;
                 let position = -1;
-                for (let element of list_possible_highlights) {
-                    if (element !== highlight_cards[0]) {
+                for (let element of listPossibleHighlights) {
+                    if (element !== highlightCards[0]) {
                         count += 1;
                     } else {
                         position = count;
                         break;
                     }
                 }
-                let cards_list = x_column.getElementsByClassName('cards-list')[0];
-                clone_node.getElementsByClassName('white-card')[0].classList.remove('invisible-card');
+                let cardsList = xColumn.getElementsByClassName('cards-list')[0];
+                cloneNode.getElementsByClassName('white-card')[0].classList.remove('invisible-card');
                 if (position === -1) {
-                    cards_list.appendChild(clone_node);
-                    cards_list.scrollTo(0, 9999);
-                    window.kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, count + 1);
+                    cardsList.appendChild(cloneNode);
+                    cardsList.scrollTo(0, 9999);
+                    window.kanbanManager.moveColumnCard(cloneNode.id, oldColumnId, xColumn.id, count + 1);
                 } else {
-                    let x_task_blocks = x_column.getElementsByClassName('task-block');
-                    cards_list.insertBefore(clone_node, x_task_blocks[position]);
-                    window.kanbanManager.moveColumnCard(clone_node.id, oldColumnId, x_column.id, position);
+                    let xTaskBlocks = xColumn.getElementsByClassName('task-block');
+                    cardsList.insertBefore(cloneNode, xTaskBlocks[position]);
+                    window.kanbanManager.moveColumnCard(cloneNode.id, oldColumnId, xColumn.id, position);
                 }
 
 
             } else {
 
 
-                document.getElementById(window.touched_element.id).getElementsByClassName('white-card')[0].classList.remove('invisible-card'); //это из-за веселого бага)))
-                window.touch_card.classList.remove('invisible-card');
+                document.getElementById(window.touchedElement.id).getElementsByClassName('white-card')[0].classList.remove('invisible-card'); //это из-за веселого бага)))
+                window.touchCard.classList.remove('invisible-card');
 
 
             }
         }
+
         removeHighlight();
         let absoluteCard = window.absoluteCard;
         window.absoluteCard = null;
@@ -208,68 +201,151 @@ function mouseupWindowListener(event) {
 
             removeElement(absoluteCard);
 
-            window.last_mouse_over_element = null;
-            window.touch_card = null;
-            window.touched_element = null;
+            window.lastMouseOverElement = null;
+            window.touchCard = null;
+            window.touchedElement = null;
             window.absoluteCard = null;
             document.body.style.pointerEvents = "auto";
         }, 200);
-
-
     }
+}
+
+//Others Listeners
+function closeColumn(event) {
+
+    removeElement(event.closest('.column'));
+
+}
+
+function closeTaskInput(event) {
+    let cardContainer = event.closest('.column-container');
+    removeElement(event.closest('.input-block'));
+    cardContainer.appendChild(createElementFromHTML(window.strings.cardContainerBodyDelete.t()));
+}
+
+function saveTaskName(event) {
+
+    if (!event.shiftKey && event.keyCode === 13 || !event.type.localeCompare('click')) {
+
+
+        let column = event.target.closest('.column');
+        let input = column.getElementsByClassName('textarea')[0];
+        let title = input.value;
+
+        title.replace(/^\s*\n/gm, "");
+        if (isStringEmpty(title)) {
+            title = "";
+
+            input.value = "";
+        }
+
+
+        if (title !== "") {
+            let id = kanbanManager.saveColumnCard(title, column.id);
+            let cardContainer = event.target.closest('.column-container');
+            let inputBlock = cardContainer.getElementsByClassName('input-block')[0];
+            removeElement(inputBlock);
+            let cardsList = cardContainer.getElementsByClassName('cards-list')[0];
+            cardsList.classList.remove('card-list-with-input');
+            cardsList.appendChild(createElementFromHTML(window.strings.cardBody.t(id, title)));
+
+            cardContainer.appendChild(createElementFromHTML(window.strings.oneMoreCardPart.t()));
+
+
+            cardContainer.getElementsByClassName('cards-list')[0].scrollTo({
+                top: 9999,
+                left: 0,
+                behavior: 'smooth'
+            });
+        } else {
+            alert('Заполните поле');
+        }
+    }
+}
+
+function saveColumnName(event) {
+    if (!event.shiftKey && event.keyCode === 13 || !event.type.localeCompare('click')) {
+        let column = event.target.closest('.column');
+
+        let input = column.getElementsByClassName('textarea')[0];
+        let title = input.value;
+
+        title.replace(/^\s*\n/gm, "");
+        if (isStringEmpty(title)) {
+            title = "";
+
+            input.value = "";
+        }
+
+        if (title !== "") {
+            event.target.closest('.column').id = kanbanManager.saveColumn(title);
+            if (title.length > 65) {
+                title = title.substring(0, 60) + "...";
+            }
+            column.getElementsByClassName('column-container')[0].innerHTML = window.strings.columnName.t(title);
+        } else {
+            alert("Заполните поле")
+        }
+    }
+}
+
+function openTaskInput(event) {
+    let cardContainer = event.closest('.column-container');
+    removeElement(event);
+    let cardsList = cardContainer.getElementsByClassName('cards-list')[0];
+    cardsList.classList.add('card-list-with-input');
+    cardContainer.appendChild(createElementFromHTML(window.strings.cardContainerBodyInputState.t()));
 }
 
 /**App initiation */
 window.onload = function () {
     initPage();
-
 };
 
 
-/**Usual functions */
-
+/**Usual functions: Take it and done it*/
 
 
 function removeHighlight() {
-    if (window.last_highlight) {
-        if (window.last_highlight.element.classList.contains('removable')) {
-            removeElement(window.last_highlight.element);
+    if (window.lastHighlight) {
+        if (window.lastHighlight.element.classList.contains('removable')) {
+            removeElement(window.lastHighlight.element);
         } else {
-            window.last_highlight.element.style.height = '0';
-            window.last_highlight.element.classList.remove('highlight-card');
+            window.lastHighlight.element.style.height = '0';
+            window.lastHighlight.element.classList.remove('highlight-card');
         }
     }
-    window.last_highlight = null;
+    window.lastHighlight = null;
 }
 
 function addHighlight() {
-    window.last_highlight = {};
-    if (window.last_mouse_over_element.classList.contains('column')) {
+    window.lastHighlight = {};
+    if (window.lastMouseOverElement.classList.contains('column')) {
 
 
-        let cards_list = window.last_mouse_over_element.getElementsByClassName('cards-list')[0];
-        cards_list.appendChild(createElementFromHTML(window.strings.removable_highlight.t()));
+        let cardsList = window.lastMouseOverElement.getElementsByClassName('cards-list')[0];
+        cardsList.appendChild(createElementFromHTML(window.strings.removableHighlight.t()));
 
-        cards_list.getElementsByClassName('removable')[0].style.height = `${window.absoluteCard.offsetHeight - 20}px`;
-        window.last_highlight.element = cards_list.getElementsByClassName('removable')[0];
-        cards_list.scrollTo(0, 9999);
+        cardsList.getElementsByClassName('removable')[0].style.height = `${window.absoluteCard.offsetHeight - 20}px`;
+        window.lastHighlight.element = cardsList.getElementsByClassName('removable')[0];
+        cardsList.scrollTo(0, 9999);
 
 
     } else {
 
-        let place_to_insert = window.last_mouse_over_element.getElementsByClassName('place-to-insert')[0];
-        place_to_insert.classList.add('highlight-card');
-        place_to_insert.style.height = `${window.absoluteCard.offsetHeight - 20}px`;
-        place_to_insert.closest('.cards-list').scrollTo(0, place_to_insert.offsetTop - 100);
-        window.last_highlight.element = place_to_insert;
+        let placeToInsert = window.lastMouseOverElement.getElementsByClassName('place-to-insert')[0];
+        placeToInsert.classList.add('highlight-card');
+        placeToInsert.style.height = `${window.absoluteCard.offsetHeight - 20}px`;
+        placeToInsert.closest('.cards-list').scrollTo(0, placeToInsert.offsetTop - 100);
+        window.lastHighlight.element = placeToInsert;
 
     }
 
 
-    window.last_highlight.offsetTop = window.last_mouse_over_element.offsetTop;
-    window.last_highlight.offsetHeight = window.last_mouse_over_element.offsetHeight;
-    window.last_highlight.offsetLeft = window.last_mouse_over_element.offsetLeft;
-    window.last_highlight.offsetWidth = window.last_mouse_over_element.offsetWidth;
+    window.lastHighlight.offsetTop = window.lastMouseOverElement.offsetTop;
+    window.lastHighlight.offsetHeight = window.lastMouseOverElement.offsetHeight;
+    window.lastHighlight.offsetLeft = window.lastMouseOverElement.offsetLeft;
+    window.lastHighlight.offsetWidth = window.lastMouseOverElement.offsetWidth;
 
 }
 
@@ -304,136 +380,28 @@ function removeElement(elementId) {
     element.parentNode.removeChild(element);
 }
 
-function closeColumn(ev) {
-
-    removeElement(ev.closest('.column'));
-
-}
-
-function closeTaskInput(ev) {
-    let card_container = ev.closest('.column-container');
-    removeElement(ev.closest('.input_block'));
-    card_container.appendChild(createElementFromHTML(window.strings.card_container_body_delete.t()));
-}
-
-function saveTaskName(ev) {
-
-    if (!ev.shiftKey && ev.keyCode === 13 || !ev.type.localeCompare('click')) {
-
-
-        let column = ev.target.closest('.column');
-        let input = column.getElementsByClassName('textarea')[0];
-        let title = input.value;
-
-        title.replace(/^\s*\n/gm, "");
-        if (isStringEmpty(title)) {
-            title = "";
-
-            input.value = "";
-        }
-
-
-        if (title !== "") {
-            let id = kanbanManager.saveColumnCard(title, column.id);
-            let card_container = ev.target.closest('.column-container');
-            let input_block = card_container.getElementsByClassName('input_block')[0];
-            removeElement(input_block);
-            let cards_list = card_container.getElementsByClassName('cards-list')[0];
-            cards_list.classList.remove('card-list-with-input');
-            cards_list.appendChild(createElementFromHTML(window.strings.card_body.t(id, title)));
-
-            card_container.appendChild(createElementFromHTML(window.strings.one_more_card_part.t()));
-
-
-            card_container.getElementsByClassName('cards-list')[0].scrollTo({
-                top: 9999,
-                left: 0,
-                behavior: 'smooth'
-            });
-        } else {
-            alert('Заполните поле');
-        }
-    }
-}
-
 function createElementFromHTML(htmlString) {
     let div = document.createElement('div');
     div.innerHTML = htmlString.trim();
     return div.firstChild;
 }
 
-function openTaskInput(ev) {
-    let card_container = ev.closest('.column-container');
-    removeElement(ev);
-    let cards_list = card_container.getElementsByClassName('cards-list')[0];
-    cards_list.classList.add('card-list-with-input');
-    //card_container.innerHTML += window.strings.card_container_body_input_state.t();
-    card_container.appendChild(createElementFromHTML(window.strings.card_container_body_input_state.t()));
-    //cards-list.closest('.cards-list').scrollTo(0, 5999); //ne rabot
-}
-
 function isStringEmpty(str) {
     return (!str || /^\s*$/.test(str));
 }
 
-function saveColumnName(ev) {
-    if (!ev.shiftKey && ev.keyCode === 13 || !ev.type.localeCompare('click')) {
-        let column = ev.target.closest('.column');
-
-        let input = column.getElementsByClassName('textarea')[0];
-        let title = input.value;
-
-        title.replace(/^\s*\n/gm, "");
-        if (isStringEmpty(title)) {
-            title = "";
-
-            input.value = "";
-        }
-
-        if (title !== "") {
-            ev.target.closest('.column').id = kanbanManager.saveColumn(title);
-            if (title.length > 65) {
-                title = title.substring(0, 60) + "...";
-            }
-            column.getElementsByClassName('column-container')[0].innerHTML = window.strings.column_name.t(title);
-        } else {
-            alert("Заполните поле")
-        }
-    }
-}
-
 function autoExpand(field) {
-
     field.style.height = 'inherit';
-
-
     let computed = window.getComputedStyle(field);
-
-
-    let height = parseInt(computed.getPropertyValue('border-top-width'), 10)
-        + parseInt(computed.getPropertyValue('padding-top'), 10)
-        + field.scrollHeight
-        + parseInt(computed.getPropertyValue('padding-bottom'), 10)
-        + parseInt(computed.getPropertyValue('border-bottom-width'), 10);
+    let height = parseInt(computed.getPropertyValue('border-top-width'), 10) +
+        parseInt(computed.getPropertyValue('padding-top'), 10) +
+        field.scrollHeight +
+        parseInt(computed.getPropertyValue('padding-bottom'), 10) +
+        parseInt(computed.getPropertyValue('border-bottom-width'), 10);
 
     field.style.height = height + 'px';
 }
 
-function autoExpandTextArea() {
-    document.addEventListener('input', function (event) {
-        if (event.target.tagName.toLowerCase() !== 'textarea') return;
-        autoExpand(event.target);
-    }, false);
-}
-
-function addElement(parentId, elementTag, elementId, html) {
-
-    var p = document.getElementById(parentId);
-    var newElement = document.createElement(elementTag);
-    newElement.setAttribute('id', elementId);
-    newElement.innerHTML = html;
-    p.appendChild(newElement);
-}
 
 // Эта функция инициирует приложение
 function initPage() {
@@ -441,52 +409,15 @@ function initPage() {
     setBackground(window.strings.backgroundPath.t(), '20%', '60%');
 
     //Инициируем глобальные листнеры
-    autoExpandTextArea();
+    document.addEventListener('input', function (event) {
+        if (event.target.tagName.toLowerCase() !== 'textarea') return;
+        autoExpand(event.target);
+    }, false);
     window.kanbanManager = new KanbanManager();
     document.onmousemove = mousemoveWindowListener;
     document.onmouseup = mouseupWindowListener;
 
 }
-
-let active = false;
-let initialX;
-let initialY;
-let xOffset = 0;
-let yOffset = 0;
-let xOff = 0;
-let yOff = 0;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

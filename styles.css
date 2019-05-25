@@ -51,10 +51,9 @@ input:focus, textarea {
     margin-bottom: 5px;
 }
 
-
 .column-grey-footer {
     color: #6B808C;
-    margin-top: 9px;
+    margin-top: 7px;
     display: flex;
     align-items: center;
     -webkit-user-select: none;
@@ -66,9 +65,11 @@ input:focus, textarea {
 .removable{
     margin-bottom: 8px;
 }
+
 .column-icon{
     padding-right: 5px;
 }
+
 .column {
     flex: 0 0 auto;
     width: 272px;
@@ -103,9 +104,11 @@ input:focus, textarea {
     border-radius: 3px;
     background: #39C071;
 }
+
 .green-column-footer{
     justify-content: space-between;
 }
+
 .scrolling-wrapper-flex-box {
     display: flex;
     flex-wrap: nowrap;
@@ -167,6 +170,7 @@ input:focus, textarea {
 
     color: #000000;
 }
+
 .absolute-half-visible-card {
     opacity: .5 !important;
 }
@@ -244,7 +248,6 @@ input:focus, textarea {
     transform: translateY(-100px);
 }
 
-
 .white-card {
     background: white;
     border-radius: 3px;
@@ -259,21 +262,6 @@ input:focus, textarea {
 
 }
 
-
-.dragging {
-    opacity: 1 !important;
-    border: 1px solid blue;
-}
-
-
-.card--content {
-    width: 300px;
-    height: fit-content;
-    background-color: #EDEEF0;
-    border-radius: 3px;
-    margin: 0 10px 0 10px;
-}
-
 .grey-text-color {
     color: #738FA3;
     -moz-user-select: none;
@@ -282,7 +270,4 @@ input:focus, textarea {
     user-select: none;
 }
 
-.spacer {
-    min-width: 10px;
-}
 
