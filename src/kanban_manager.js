@@ -14,6 +14,7 @@ class KanbanManager {
             }
         }
     }
+
     static isObjectEmpty(obj) {
         for (let key in obj) {
             if (obj.hasOwnProperty(key))
@@ -31,8 +32,10 @@ class KanbanManager {
         for (let i = 0, length = this.columnArray.length; i < length; i++) {
             let cardsList = "";
             if (!KanbanManager.isObjectEmpty(this.columnsData)) {
-                for (let j = 0, j_length = this.columnsData[i].length; j < j_length; j++) {
-                    cardsList += window.strings.cardReadyPattern.t(this.columnsData[i][j], this.cardsArray[this.columnsData[i][j]]);
+                if (this.columnsData[i]) {
+                    for (let j = 0, j_length = this.columnsData[i].length; j < j_length; j++) {
+                        cardsList += window.strings.cardReadyPattern.t(this.columnsData[i][j], this.cardsArray[this.columnsData[i][j]]);
+                    }
                 }
             }
             let column = window.strings.columnReadyRattern.t(i, this.columnArray[i], cardsList);
